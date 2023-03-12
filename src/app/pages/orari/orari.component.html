@@ -1,0 +1,88 @@
+<div class="main-area">
+  <main>
+    <ngx-spinner bdColor="rgba(255, 255, 255, 0.8)" size="medium" [zIndex]="50" color="#118ab2"
+                 type="ball-clip-rotate-multiple" [fullScreen]="false">
+      <p > Caricamento... </p>
+    </ngx-spinner>
+
+    <br>
+    <!--<div class="grid">
+      <div class="col">
+        <button pButton type="button" label="Torna al menù principale" icon="pi pi-arrow-circle-left"
+                class="p-button-primary p-button-raised" routerLink="/admin"></button>
+      </div>
+    </div>
+    <br>-->
+    <br>
+    <div class="title-section" >
+      <i class="las la-user"></i> Registro del giorno {{todayDate |  date:'dd/MM/YYYY'}}
+    </div>
+    <p-divider type="dashed"></p-divider>
+    <ngx-spinner bdColor="rgba(255, 255, 255, 0.8)" size="medium" [zIndex]="50" color="#118ab2"
+                 type="ball-clip-rotate-multiple" [fullScreen]="false">
+      <p style="color: #118ab2"> Caricamento... </p>
+    </ngx-spinner>
+    <form [formGroup]="formNewUser" (submit)="addOrari()" >
+      <div class="p-fluid formgrid grid justify-content-start">
+        <div class="field col-4 md:md-3">
+          <h3><label for="email">Email</label></h3>
+          <p-autoComplete id="email" formControlName="email" (completeMethod)="autoComplete()" [suggestions]="filteredUser" field="email" type="text" [required]="true"
+          (change)="completeCourse($event)" [dropdown]="false"></p-autoComplete>
+                 <!--[ngClass]="{'ng-invalid ng-dirty': !formNewUser.get('email')?.valid && (formNewUser.get('email')?.dirty || formNewUser.get('email')?.touched)}"-->
+
+        </div>
+        <div class="field col-4 md:md-3" *ngIf="required">
+          <h3><label for="name">Nome</label></h3>
+          <input id="name" formControlName="name" [required]="required"
+                 [ngClass]="{'ng-invalid ng-dirty': !formNewUser.get('name')?.valid && (formNewUser.get('name')?.dirty || formNewUser.get('name')?.touched)}"
+                 type="text" pInputText >
+        </div>
+        <div class="field col-4 md:md-3" *ngIf="required">
+          <h3><label for="surname">Cognome</label></h3>
+          <input id="surname" formControlName="surname" [required]="required"
+                 [ngClass]="{'ng-invalid ng-dirty': !formNewUser.get('surname')?.valid && (formNewUser.get('surname')?.dirty || formNewUser.get('surname')?.touched)}"
+                 type="text" pInputText >
+        </div>
+        <div class="field col-4 md:md-3" *ngIf="required">
+          <h3> <label for="corso">Corso</label></h3>
+          <p-dropdown inputId="corso" formControlName="corso" [options]="corsi" [required]="required"
+                      optionLabel="name" optionValue="id" placeholder="Seleziona">
+          </p-dropdown>
+          <!-- <small id="username2-help" *ngIf="formNewUser.get('cognome')?.invalid && (formNewUser.controls['cognome'].dirty || formNewUser.controls['cognome'].touched)" class="p-error">Il valore inserito non è valido.</small> -->
+        </div>
+
+        <div class="field col-4 md:md-3">
+          <h3> <label for="entrata">Orario di entrata</label></h3>
+          <p-calendar id="entrata" type="text" formControlName="entrata" [required]="true" [timeOnly]="true" class="timer" [stepMinute]="5" [defaultDate]="todayDate" hourFormat="24"
+                       (onSelect)="checkHour()"
+                      #initialHour [stepHour]="1"></p-calendar>
+          <!-- <small id="username2-help" *ngIf="formNewUser.get('cognome')?.invalid && (formNewUser.controls['cognome'].dirty || formNewUser.controls['cognome'].touched)" class="p-error">Il valore inserito non è valido.</small> -->
+        </div>
+        <div class="field col-4 md:md-3">
+          <h3> <label for="uscita">Orario di uscita</label></h3>
+          <p-calendar id="uscita" type="text" formControlName="uscita" [required]="true" [timeOnly]="true" class="timer" [stepMinute]="5" [defaultDate]="startFineDefault" hourFormat="24"
+
+                      #initialHour [stepHour]="1"></p-calendar>
+          <!-- <small id="username2-help" *ngIf="formNewUser.get('cognome')?.invalid && (formNewUser.controls['cognome'].dirty || formNewUser.controls['cognome'].touched)" class="p-error">Il valore inserito non è valido.</small> -->
+        </div>
+
+        <div class="field col-12 md-12">
+          <p-divider type="dashed"></p-divider>
+        </div>
+
+      </div>
+      <div class="p-fluid grid justify-content-end">
+
+        <div class="field col-2 md:md-2"><!-- [disabled]="!formNewUser.valid"-->
+          <button pButton type="submit" label="Salva" class="p-button p-button-success"
+                  [disabled]="!formNewUser?.valid "></button>
+        </div>
+      </div>
+    </form>
+    <p-message severity="error" text="Attenzione! Campo/i non popolati correttamente"
+               *ngIf="!formNewUser.valid && formNewUser.errors" @simpleFadeAnimation></p-message>
+    <p-messages [enableService]="true" key="tableCorsi"></p-messages>
+  </main>
+</div>
+
+

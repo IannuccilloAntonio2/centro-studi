@@ -1,0 +1,233 @@
+<div class="main-area" xmlns="http://www.w3.org/1999/html">
+  <main>
+    <ngx-spinner [fullScreen]="true" [zIndex]="50" bdColor="rgba(255, 255, 255, 0.8)" color="#118ab2"
+                 size="medium" type="square-jelly-box">
+      <p style="color: #118ab2"> Caricamento... </p>
+    </ngx-spinner>
+    <div class="title-with-button">
+
+      <div class="child2">
+        <i class="las la-users"></i> <span>Tasse</span>
+      </div>
+
+      <div class="child">
+        <button (click)="addTasse=true"
+                class="p-button-primary p-button-raised p-button-lg" icon="pi pi-plus" label="Aggiungi tasse"
+                pButton type="button"></button>
+      </div>
+    </div>
+    <div *ngIf="!addTasse" class="card">
+      <p-table
+
+        *ngIf="tasse.length!==0"
+
+        [paginator]="true"
+        [rowsPerPageOptions]="[10,20,30]" [rows]="10" [showCurrentPageReport]="true"
+        [totalRecords]="tasse.length"
+        [value]="tasse"
+        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords}"
+        responsiveLayout="scroll | stack"
+      >
+        <ng-template let-columns pTemplate="header">
+          <tr>
+            <th class="text-center">Nome</th>
+            <th class="text-center">Data creazione</th>
+            <!-- <th scope="col" class="p-text-center">Tredicesima</th> -->
+            <th class="text-center">Stato</th>
+            <th class="text-center">Azioni</th>
+          </tr>
+        </ng-template>
+        <ng-template let-columns="columns" let-practice pTemplate="body">
+          <tr>
+            <td class="text-center click">{{ practice.name }}</td>
+            <td class="text-center click">{{ practice.creationDate }}</td>
+            <td class="text-center click">{{ practice.alias}}</td>
+
+            <td class="text-center">
+              <button class="p-button p-button-text p-button-lg" icon="la la-eye" pButton type="button"
+              ></button>
+              <p-confirmPopup></p-confirmPopup>
+              <button class="p-button p-button-danger p-button-text p-button-lg" icon="las la-trash" pButton
+                      type="button"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+
+    <div *ngIf="addTasse">
+      <div class="p-fluid formgrid grid justify-content-start">
+        <div class="field col-12 md:col-3">
+          <label for="corso">Cerca corso</label>
+          <input
+            (ngModelChange)="searchCourse()" [(ngModel)]="cercaCorso"
+            id="corso" pInputText type="text">
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="corso">&nbsp;</label>
+          <button [disabled]="cercaCorso.length==0"
+                  class="p-button-primary p-button-raised p-button" icon="pi pi-search" label="Cerca"
+                  pButton type="button"
+          ></button>
+
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="corso">&nbsp;</label>
+          <button (click)="newCorso()"
+                  class="p-button-warning p-button-raised p-button" icon="pi pi-plus" label="Nuovo corso"
+                  pButton type="button"
+          ></button>
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="corso">&nbsp;</label>
+          <button (click)="addTasse=false;"
+                  class="p-button-danger p-button-raised p-button" icon="pi pi-plus" label="Chiudi"
+                  pButton type="button"
+          ></button>
+        </div>
+      </div>
+      <p-table
+
+        *ngIf="cercaCorso.length>0 && !selectFrormSearch"
+
+        [paginator]="true"
+        [rowsPerPageOptions]="[10,20,30]" [rows]="10" [showCurrentPageReport]="true"
+        [totalRecords]="corsi.length"
+        [value]="corsi"
+        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords}"
+        responsiveLayout="scroll | stack"
+      >
+        <ng-template let-columns pTemplate="header">
+          <tr>
+            <th class="text-center">Nome</th>
+            <th class="text-center">Studenti</th>
+
+            <th class="text-center">Azione</th>
+          </tr>
+        </ng-template>
+        <ng-template let-columns="columns" let-practice pTemplate="body">
+          <tr>
+            <td class="text-center click">{{ practice.name }}</td>
+            <td class="text-center click">{{ practice.utenti.length }}</td>
+            <td class="text-center click">
+              <button (click)="selectCorso(practice)"
+                      class="p-button-success p-button-raised p-button" icon="pi pi-plus"
+                      label="Seleziona" pButton type="button"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div *ngIf="corsi.length==0 && cercaCorso.length>0" class="p-grid">
+        <div class="p-col-12">
+          <div class="msgNoDipendenti">
+            <span class="las la-5x la-info-circle"></span>
+            <h3>Nessun corso trovato</h3>
+          </div>
+        </div>
+      </div>
+      <br>
+      <form (submit)="addTasseForm()" [formGroup]="formAddTasse">
+        <div *ngIf="newCourse || selectFrormSearch" class="p-fluid formgrid grid justify-content-start">
+          <div class="field col-12 md:col-2">
+            <label for="nomeCorso">Nome del corso</label>
+            <input
+              [ngClass]="{'ng-invalid ng-dirty': !formAddTasse.get('nomeCorso')?.valid && (formAddTasse.get('nomeCorso')?.dirty || formAddTasse.get('nomeCorso')?.touched)}"
+              [required]="true"
+              formControlName="nomeCorso"
+              id="nomeCorso" pInputText type="text">
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="dataInizio">Data inizio corso</label>
+            <p-calendar #initialHour
+                        [readonlyInput]="true"
+                        [required]="true" [showIcon]="true"
+                        dateFormat="dd/mm/yy" formControlName="dataInizio" hourFormat="24" (ngModelChange)="setDate()"
+                        name="dataInizio"></p-calendar>
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="dataFine">Data fine corso</label>
+            <p-calendar #initialHour [readonlyInput]="true" [required]="true"
+                        [showIcon]="true" [minDate]="formAddTasse.get('dataInizio')?.value"
+                        dateFormat="dd/mm/yy"
+                        formControlName="dataFine" hourFormat="24"
+                        name="dataFine"></p-calendar>
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="costo">Costo complessivo corso</label>
+            <input
+              [min]="1"
+              [ngClass]="{'ng-invalid ng-dirty': !formAddTasse.get('costo')?.valid && (formAddTasse.get('costo')?.dirty || formAddTasse.get('costo')?.touched)}" [required]="true"
+              formControlName="costo"
+              id="costo" pInputText type="number">
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="corso">&nbsp;</label>
+            <button [disabled]="!formAddTasse.valid"
+                    class="p-button-success p-button-raised p-button" icon="pi pi-plus" label="Prosegui"
+                    pButton type="submit"
+            ></button>
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="corso">&nbsp;</label>
+            <button (click)="showStudent()"
+                    [icon]="utenti.length>0 ? 'pi pi-eye' :'pi pi-plus' "
+                    [label]="utenti.length>0 ? 'Mostra studenti' :'Aggiungi studenti' " class="p-button-warning p-button-raised p-button"
+                    pButton type="button"
+            ></button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    <p-dialog (onHide)="spinner.hide()" [(visible)]="showStudentDialog"
+              [closable]="true"
+              [draggable]="false" [header]="'Studenti per il corso' + formAddTasse.get('nomeCorso')?.value" [modal]="true" [resizable]="false">
+      <button class="p-button-primary p-button-raised p-button"
+              icon="pi pi-plus" label="Aggiungi studenti"
+              pButton type="button"></button>
+      <br>
+      <p-table
+        *ngIf="utenti.length>0"
+        [autoLayout]="true"
+        [paginator]="true"
+        [rowHover]="true"
+        [rowsPerPageOptions]="[10,20,30]"
+        [rows]="10" [showCurrentPageReport]="true" [totalRecords]="utenti.length"
+        [value]="utenti"
+        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} utente/i"
+        styleClass="datatable-gridlines datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center" pSortableColumn="name" scope="col">
+              Nome
+              <p-sortIcon field="name"></p-sortIcon>
+              <p-columnFilter display="menu" field="name" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="surname" scope="col">
+              Cognome
+              <p-sortIcon field="surname"></p-sortIcon>
+              <p-columnFilter display="menu" field="surname" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="email" scope="col">
+              Email
+              <p-sortIcon field="email"></p-sortIcon>
+              <p-columnFilter display="menu" field="email" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="email" scope="col">
+          </tr>
+        </ng-template>
+        <ng-template let-user pTemplate="body">
+          <tr>
+            <td class="click text-center">{{user.name}}</td>
+            <td class="click text-center">{{user.surname}}</td>
+            <td class="click text-center">{{user.email}}</td>
+
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-dialog>
+  </main>
+</div>

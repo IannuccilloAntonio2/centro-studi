@@ -1,0 +1,426 @@
+<div class="main-area">
+  <main>
+    <ngx-spinner [fullScreen]="true" [zIndex]="50" bdColor="rgba(255, 255, 255, 0.8)" color="#118ab2"
+                 size="medium" type = "square-jelly-box" >
+      <p style="color: #118ab2"> Caricamento... </p>
+    </ngx-spinner>
+    <!--<br>
+    <div class="grid">
+      <div class="col">
+        <button pButton type="button" label="Torna al menù principale" icon="pi pi-arrow-circle-left"
+                class="p-button-primary p-button-raised" routerLink="/admin"></button>
+      </div>
+    </div>
+    <br>-->
+    <br>
+    <div *ngIf="displayModalList" class="title-with-button">
+
+      <div class="child2"><i class="las la-users"></i> <span>Utenti associati al corso</span>
+        <p-overlayPanel #op>
+          <ng-template pTemplate>
+            <p-calendar #calendar [defaultDate]="todayDate"
+                        [inline]="true"
+                        [monthNavigator]="true"
+                        [yearNavigator]="true"
+                        dateFormat="dd/mm/yy"></p-calendar>
+            <button (click)="addCourseForSpecificUser(calendar)" class="p-button p-button-info ">Continua</button>
+          </ng-template>
+        </p-overlayPanel>
+      </div>
+
+      <div class="child">
+        <button (click)="op.toggle($event); multipleInsert = false" class="p-button p-button-info ">Inserisci presenza
+        </button>
+        <button (click)="op.toggle($event); multipleInsert = true" class="p-button p-button-warning">Inserisci presenze
+          multiple
+        </button>
+        <button (click)="displayModalList = false" class="p-button p-button-danger">Chiudi</button>
+      </div>
+    </div>
+    <div *ngIf="!displayModalList" class="title-with-button">
+
+      <div class="child2">
+        <i class="las la-users"></i> <span>Corsi</span>
+      </div>
+
+      <div class="child">
+        <button (click)="displayModal()" *ngIf="!displayModalList" class="p-button-primary p-button-raised p-button-lg"
+                icon="pi pi-plus" label="Nuovo corso"
+                pButton type="button"></button>
+      </div>
+    </div>
+
+
+    <p-dialog [(visible)]="display" [draggable]="false" [resizable]="false"
+              [style]="{width: '50vw', 'margin-top': '100px'}" header="Aggiungi corso" position="top">
+      <form (submit)="addCorso()" [formGroup]="formNewCorso">
+        <div class="p-fluid formgrid grid justi">
+          <div class="field col-6 md:md-6">
+            <h3><label for="name">Nome del corso</label></h3>
+            <input
+              [ngClass]="{'ng-invalid ng-dirty': !formNewCorso.get('name')?.valid && (formNewCorso.get('name')?.dirty || formNewCorso.get('name')?.touched)}"
+              [required]="true"
+              formControlName="name"
+              id="name" pInputText type="text">
+          </div>
+        </div>
+
+      </form>
+      <ng-template pTemplate="footer">
+        <p-button (click)="addCorso()" [disabled]="!formNewCorso.valid" icon="pi pi-check" label="Salva"
+                  styleClass="p-button-text"></p-button>
+      </ng-template>
+    </p-dialog>
+
+    <p-divider type="dashed"></p-divider>
+    <!-- <div style="text-align: right;">
+      <button pButton type="button" label="Nuovo dipendente" class=" p-button-success p-button-md" (click)="nuovoDipendente()"></button>
+    </div> -->
+    <p-divider type="none"></p-divider>
+
+    <div *ngIf="corsi.length==0" class="p-grid">
+      <div class="p-col-12">
+        <div class="msgNoDipendenti">
+          <span class="las la-5x la-info-circle"></span>
+          <h3>Nessun corso inserito al momento</h3>
+        </div>
+      </div>
+    </div>
+
+
+    <p-table
+      *ngIf="corsi && !displayModalList"
+      [autoLayout]="true"
+      [paginator]="true"
+      [rowHover]="true"
+      [rowsPerPageOptions]="[10,20,30]"
+      [rows]="10" [showCurrentPageReport]="true" [totalRecords]="corsi.length"
+      [value]="corsi"
+      currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} corso/i"
+      styleClass="datatable-gridlines datatable-sm">
+      <ng-template pTemplate="header">
+        <tr>
+          <th class="text-center" pSortableColumn="corso" scope="col">
+            Corso
+            <p-sortIcon field="cognome"></p-sortIcon>
+            <p-columnFilter display="menu" field="corso" type="text"></p-columnFilter>
+          </th>
+          <th class="text-center" pSortableColumn="studenti" scope="col">
+            Studenti
+            <p-sortIcon field="name"></p-sortIcon>
+            <p-columnFilter display="menu" field="studenti" type="text"></p-columnFilter>
+          </th>
+
+          <th class="text-center" scope="col">
+            Azioni
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template let-corso pTemplate="body">
+        <tr>
+          <td class="click text-center">{{corso.name}}</td>
+          <td class="click text-center">{{corso.utenti.length}}</td>
+
+          <td class="text-center">
+            <button (click)="infoCorso(corso.id)" class="p-button  p-button-secondary" label="Info Corso" pButton
+                    type="button"
+            ></button>
+            &nbsp;&nbsp;
+            <button (click)="exportToPDF(corso.id)" class="p-button " label="Stampa Registro" pButton
+                    type="button"></button>
+            &nbsp;&nbsp;
+            <button (click)="delete($event, corso.id)" class="p-button p-button-danger" label="Elimina" pButton
+                    type="button"></button>
+            <p-confirmPopup></p-confirmPopup>
+
+
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p-dialog [(visible)]="displayModalAddPresenza" [draggable]="false" [modal]="true"
+              [resizable]="false" [style]="{width: '100%',height:'80vw'}" position="top">
+      <app-new-user (displayModalAddPresenza)="childToParent($event)" (displayModalList)="childToParent($event)"
+                    (presenzeDay)="childToParent($event)" [course]="corsoSelected.id"
+                    [todayDate]="todayDate"></app-new-user>
+    </p-dialog>
+
+
+    <p-messages [enableService]="true"></p-messages>
+
+    <div *ngIf="displayModalList">
+
+
+      <p-table
+        *ngIf="corsoSelected.utenti"
+        [autoLayout]="true"
+        [paginator]="true"
+        [rowHover]="true"
+        [rowsPerPageOptions]="[10,20,30]"
+        [rows]="10" [showCurrentPageReport]="true" [totalRecords]="corsoSelected.utenti.length"
+        [value]="corsoSelected.utenti"
+        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} utente/i"
+        styleClass="datatable-gridlines datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center" pSortableColumn="name" scope="col">
+              Nome
+              <p-sortIcon field="name"></p-sortIcon>
+              <p-columnFilter display="menu" field="name" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="surname" scope="col">
+              Cognome
+              <p-sortIcon field="surname"></p-sortIcon>
+              <p-columnFilter display="menu" field="surname" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="email" scope="col">
+              Email
+              <p-sortIcon field="email"></p-sortIcon>
+              <p-columnFilter display="menu" field="email" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="email" scope="col">
+          </tr>
+        </ng-template>
+        <ng-template let-user pTemplate="body">
+          <tr>
+            <td class="click text-center">{{user.name}}</td>
+            <td class="click text-center">{{user.surname}}</td>
+            <td class="click text-center">{{user.email}}</td>
+            <td class="click text-center">
+              <button (click)="deleteUser($event, user.id)" class="p-button p-button-danger" label="Elimina" pButton
+                      type="button"></button>
+              <p-confirmPopup></p-confirmPopup>
+            </td>
+
+          </tr>
+        </ng-template>
+      </p-table>
+      <p-divider type="dashed"></p-divider>
+      <div class="title-with-button">
+        <div class="child2"><i class="las la-users"></i> <span>Presenze</span></div>
+
+      </div>
+      <div class="p-fluid formgrid grid justify-content-end float" style="background-color: #dedede">
+        <div class="field col-3 md:md-3 ">
+          <label for="entrata">Filtra per data</label>
+          <p-calendar #initialHour  [(ngModel)]="dateSelectedToFilter" [defaultDate]="todayDate"
+                       (ngModelChange)="checkHour(); checkFinalHour()"
+                       [readonlyInput]="true"
+                      class="timer" hourFormat="24"
+                      name="entrata" ></p-calendar>
+          <!-- <small id="username2-help" *ngIf="formNewUser.get('cognome')?.invalid && (formNewUser.controls['cognome'].dirty || formNewUser.controls['cognome'].touched)" class="p-error">Il valore inserito non è valido.</small> -->
+        </div>
+        <div class="field col-2">
+          <label>&nbsp;</label>
+          <button (click)="filterPresenze()" class="p-button p-button-info" label="Filtra" pButton type="submit"
+          ></button>
+        </div>
+        <div class="field col-2">
+          <label>&nbsp;</label>
+
+          <button (click)="onClearSearch()" class="p-button p-button-danger" label="Annulla" pButton type="submit"
+          ></button>
+        </div>
+      </div>
+
+      <p-table
+        (rowsChange)="test('ciao')"
+        *ngIf="corsoSelected.presenze"
+        [autoLayout]="true"
+        [paginator]="true"
+        [rowHover]="true"
+        [rowsPerPageOptions]="[2,4,6,8,10]" [rows]="10" [showCurrentPageReport]="true"
+        [totalRecords]="corsoSelected.presenze.length"
+        [value]="filteredPresenze"
+        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} prensenze"
+        styleClass="datatable-gridlines datatable-sm"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center" pSortableColumn="day" scope="col">
+              Giorno
+              <p-sortIcon field="day"></p-sortIcon>
+              <p-columnFilter display="menu" field="day" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="studente" scope="col">
+              Studente
+              <p-sortIcon field="studente"></p-sortIcon>
+              <p-columnFilter display="menu" field="studente" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="entrata" scope="col">
+              Entrata
+              <p-sortIcon field="entrata"></p-sortIcon>
+              <p-columnFilter display="menu" field="entrata" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="entrata" scope="col">
+              Uscita
+              <p-sortIcon field="entrata"></p-sortIcon>
+              <p-columnFilter display="menu" field="entrata" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="entrata" scope="col">
+          </tr>
+        </ng-template>
+        <ng-template let-presenza pTemplate="body">
+          <tr><!--*ngIf="today(presenza.date)"-->
+            <td class="click text-center">{{presenza.date}}</td>
+            <td class="click text-center">{{presenza.userId | userAlias:user}}</td>
+            <td class="click text-center">{{presenza.initialHour}}</td>
+            <td class="click text-center">{{presenza.finalHour}}</td>
+            <td class="click text-center">
+              <button (click)="deletePresenza($event, presenza.id)" class="p-button p-button-danger" icon="pi pi-trash"
+                      pButton
+                      type="button"></button>
+              <p-confirmPopup></p-confirmPopup>
+            </td>
+
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <p-dialog (onHide)="displayMultiple = false" [closable]="true" [(visible)]="displayMultiple"
+              [draggable]="false" [modal]="true" [resizable]="false"
+              [style]="{width: '100%',height:'80vw'}"
+              header="Presenze multiple per il corso {{corsoSelected.name}} per il giorno {{todayDate|date:'dd/MM/YYYY'}}"
+              position="top">
+
+      <ngx-spinner [fullScreen]="true" [zIndex]="50" bdColor="rgba(255, 255, 255, 0.8)" color="#118ab2"
+                   size="medium" type = "square-jelly-box">
+        <p style="color: #118ab2"> Caricamento... </p>
+      </ngx-spinner>
+      <p-divider type="dashed"></p-divider>
+      <div class="title-with-button">
+        <div class="child2"><i class="las la-users"></i> <span>Utenti </span></div>
+
+      </div>
+
+      <p-table [autoLayout]="true" [value]="userMultipleInsert" responsiveLayout="scroll"
+               selectionMode="single" *ngIf="userMultipleInsert.length>0"
+               styleClass="datatable-gridlines datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="click text-center" pSortableColumn="name">Nome e Cognome
+            </th>
+            <th class="click text-center" pSortableColumn="price"> Email
+            </th>
+            <th class="click text-center" pSortableColumn="price"> Seleziona
+            </th>
+
+          </tr>
+        </ng-template>
+        <ng-template let-rowData let-user pTemplate="body">
+          <tr [pSelectableRow]="rowData">
+            <td class="click text-center">{{user.name}} {{user.surname}}</td>
+            <td class="click text-center">{{user.email}} </td>
+            <td *ngIf="!user.presente" class="click text-center">
+
+              <button (click)="addSingleDayForSlot(user)"
+                      [class]="'p-button ' +(!user.aggiunto?'p-button-info':'p-button-danger')"
+                      pButton>
+                <span *ngIf="!user.aggiunto">Aggiungi</span><span *ngIf="user.aggiunto">Rimuovi</span>
+              </button>
+            </td>
+            <td *ngIf="user.presente" class="click text-center">
+              <button [disabled]="true" class="p-button p-button-success" pButton>Presente</button>
+            </td>
+
+          </tr>
+
+        </ng-template>
+
+      </p-table>
+      <br>
+      <div class="p-fluid formgrid grid justify-content-end float" *ngIf="userMultipleInsert.length>0" style="background-color: #dedede">
+        <div class="field col-3 md:md-3 ">
+          <label for="entrata">Entrata</label>
+          <p-calendar #initialHour  [(ngModel)]="inizio" [defaultDate]="todayDate"
+                      [stepHour]="1" (ngModelChange)="checkHour(); checkFinalHour()"
+                      [stepMinute]="5" [timeOnly]="true" [readonlyInput]="true"
+                      class="timer" hourFormat="24" id="entrata"
+                      name="entrata" ></p-calendar>
+          <!-- <small id="username2-help" *ngIf="formNewUser.get('cognome')?.invalid && (formNewUser.controls['cognome'].dirty || formNewUser.controls['cognome'].touched)" class="p-error">Il valore inserito non è valido.</small> -->
+        </div>
+        <div class="field col-3 md:md-3 ">
+          <label for="uscita">Uscita</label>
+          <p-calendar #initialHour [(ngModel)]="fine"  [stepHour]="1" [stepMinute]="5"
+                      [timeOnly]="true" (ngModelChange)="checkFinalHour()" [readonlyInput]="true"
+                      class="timer" hourFormat="24" id="uscita"
+
+                      name="uscita" ></p-calendar>
+          <!-- <small id="username2-help" *ngIf="formNewUser.get('cognome')?.invalid && (formNewUser.controls['cognome'].dirty || formNewUser.controls['cognome'].touched)" class="p-error">Il valore inserito non è valido.</small> -->
+        </div>
+        <div class="field col-2">
+          <label>&nbsp;</label>
+          <button (click)="addPresenzeMultiple()" class="p-button p-button-success" label="Salva" pButton type="submit" [disabled]="invalidHour"
+          ></button>
+        </div>
+
+
+      </div>
+      <div class="p-fluid formgrid grid justify-content-end float" *ngIf="inizio.getHours()!==0" >
+        <p-message severity="error" text="Attenzione! Inserire un orario valido"
+                   *ngIf="invalidHour" @simpleFadeAnimation></p-message>
+      </div>
+      <p-messages [enableService]="true" key="modal"></p-messages>
+      <p-divider type="dashed"></p-divider>
+      <div *ngIf="presenzeDay.length>0" class="title-with-button">
+        <div class="child2"><i class="las la-users"></i> <span>Presenze registrate</span></div>
+
+      </div>
+      <p-table
+        (rowsChange)="test('ciao')"
+        *ngIf="presenzeDay.length>0"
+        [autoLayout]="true"
+        [paginator]="true"
+        [rowHover]="true"
+        [rowsPerPageOptions]="[2,4,6,8,10]" [rows]="10" [showCurrentPageReport]="true"
+        [totalRecords]="presenzeDay.length"
+        [value]="presenzeDay"
+        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} prensenze"
+        styleClass="datatable-gridlines datatable-sm"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center" pSortableColumn="day" scope="col">
+              Giorno
+              <p-sortIcon field="day"></p-sortIcon>
+              <p-columnFilter display="menu" field="day" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="studente" scope="col">
+              Studente
+              <p-sortIcon field="studente"></p-sortIcon>
+              <p-columnFilter display="menu" field="studente" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="entrata" scope="col">
+              Entrata
+              <p-sortIcon field="entrata"></p-sortIcon>
+              <p-columnFilter display="menu" field="entrata" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="entrata" scope="col">
+              Uscita
+              <p-sortIcon field="entrata"></p-sortIcon>
+              <p-columnFilter display="menu" field="entrata" type="text"></p-columnFilter>
+            </th>
+            <th class="text-center" pSortableColumn="entrata" scope="col">
+          </tr>
+        </ng-template>
+        <ng-template let-presenza pTemplate="body">
+          <tr><!--*ngIf="today(presenza.date)"-->
+            <td class="click text-center">{{presenza.date}}</td>
+            <td class="click text-center">{{presenza.userId | userAlias:user}}</td>
+            <td class="click text-center">{{presenza.initialHour}}</td>
+            <td class="click text-center">{{presenza.finalHour}}</td>
+            <td class="click text-center">
+              <button (click)="deletePresenza($event, presenza.id)" class="p-button p-button-danger" icon="pi pi-trash"
+                      pButton
+                      type="button"></button>
+              <p-confirmPopup></p-confirmPopup>
+            </td>
+
+          </tr>
+        </ng-template>
+      </p-table>
+
+    </p-dialog>
+  </main>
+</div>
+
