@@ -7,90 +7,15 @@
     <div class="title-with-button">
 
       <div class="child2">
-        <i class="las la-users"></i> <span>Tasse</span>
+        <i class="pi pi-money-bill"></i> <span> Aggiungi Tasse</span>
       </div>
 
-      <div class="child">
-        <button (click)="addTasse=true"
-                class="p-button-primary p-button-raised p-button-lg" icon="pi pi-plus" label="Aggiungi tasse"
-                pButton type="button"></button>
-      </div>
+
     </div>
-    <div *ngIf="!addTasse" class="card">
+    <!--<div *ngIf="!addTasse" class="card" @fadeInAnimation>
       <p-table
 
-        *ngIf="tasse.length!==0"
-
-        [paginator]="true"
-        [rowsPerPageOptions]="[10,20,30]" [rows]="10" [showCurrentPageReport]="true"
-        [totalRecords]="tasse.length"
-        [value]="tasse"
-        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords}"
-        responsiveLayout="scroll | stack"
-      >
-        <ng-template let-columns pTemplate="header">
-          <tr>
-            <th class="text-center">Nome</th>
-            <th class="text-center">Data creazione</th>
-            <!-- <th scope="col" class="p-text-center">Tredicesima</th> -->
-            <th class="text-center">Stato</th>
-            <th class="text-center">Azioni</th>
-          </tr>
-        </ng-template>
-        <ng-template let-columns="columns" let-practice pTemplate="body">
-          <tr>
-            <td class="text-center click">{{ practice.name }}</td>
-            <td class="text-center click">{{ practice.creationDate }}</td>
-            <td class="text-center click">{{ practice.alias}}</td>
-
-            <td class="text-center">
-              <button class="p-button p-button-text p-button-lg" icon="la la-eye" pButton type="button"
-              ></button>
-              <p-confirmPopup></p-confirmPopup>
-              <button class="p-button p-button-danger p-button-text p-button-lg" icon="las la-trash" pButton
-                      type="button"
-              ></button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-
-
-    <div *ngIf="addTasse">
-      <div class="p-fluid formgrid grid justify-content-start">
-        <div class="field col-12 md:col-3">
-          <label for="corso">Cerca corso</label>
-          <input
-            (ngModelChange)="searchCourse()" [(ngModel)]="cercaCorso"
-            id="corso" pInputText type="text">
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="corso">&nbsp;</label>
-          <button [disabled]="cercaCorso.length==0"
-                  class="p-button-primary p-button-raised p-button" icon="pi pi-search" label="Cerca"
-                  pButton type="button"
-          ></button>
-
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="corso">&nbsp;</label>
-          <button (click)="newCorso()"
-                  class="p-button-warning p-button-raised p-button" icon="pi pi-plus" label="Nuovo corso"
-                  pButton type="button"
-          ></button>
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="corso">&nbsp;</label>
-          <button (click)="addTasse=false;"
-                  class="p-button-danger p-button-raised p-button" icon="pi pi-plus" label="Chiudi"
-                  pButton type="button"
-          ></button>
-        </div>
-      </div>
-      <p-table
-
-        *ngIf="cercaCorso.length>0 && !selectFrormSearch"
+        *ngIf="corsi.length!==0"
 
         [paginator]="true"
         [rowsPerPageOptions]="[10,20,30]" [rows]="10" [showCurrentPageReport]="true"
@@ -102,35 +27,35 @@
         <ng-template let-columns pTemplate="header">
           <tr>
             <th class="text-center">Nome</th>
-            <th class="text-center">Studenti</th>
-
-            <th class="text-center">Azione</th>
+            <th class="text-center">Prossima scadenza</th>
+            <th class="text-center">Stato</th>
+            <th class="text-center">Azioni</th>
           </tr>
         </ng-template>
         <ng-template let-columns="columns" let-practice pTemplate="body">
-          <tr>
+          <tr *ngIf="practice.tasse.length>0">
             <td class="text-center click">{{ practice.name }}</td>
-            <td class="text-center click">{{ practice.utenti.length }}</td>
-            <td class="text-center click">
-              <button (click)="selectCorso(practice)"
-                      class="p-button-success p-button-raised p-button" icon="pi pi-plus"
-                      label="Seleziona" pButton type="button"
+            <td class="text-center click">{{ practice.scadenza }}</td>
+            <td class="text-center click">{{ practice.utentiNonPaganti}}</td>
+
+            <td class="text-center">
+              <button class="p-button p-button-text p-button-lg" icon="la la-eye" pButton type="button"
+              ></button>
+              <button class="p-button p-button-danger p-button-text p-button-lg" icon="las la-trash" pButton
+                      type="button"
               ></button>
             </td>
           </tr>
         </ng-template>
       </p-table>
-      <div *ngIf="corsi.length==0 && cercaCorso.length>0" class="p-grid">
-        <div class="p-col-12">
-          <div class="msgNoDipendenti">
-            <span class="las la-5x la-info-circle"></span>
-            <h3>Nessun corso trovato</h3>
-          </div>
-        </div>
-      </div>
+    </div>-->
+
+
+    <div @fadeInAnimation class="padding">
+
       <br>
-      <form (submit)="addTasseForm()" [formGroup]="formAddTasse">
-        <div *ngIf="newCourse || selectFrormSearch" class="p-fluid formgrid grid justify-content-start">
+      <form (submit)="addTasseForm()" @fadeInAnimation [formGroup]="formAddTasse">
+        <div class="p-fluid formgrid grid justify-content-start  ">
           <div class="field col-12 md:col-2">
             <label for="nomeCorso">Nome del corso</label>
             <input
@@ -142,92 +67,334 @@
           <div class="field col-12 md:col-2">
             <label for="dataInizio">Data inizio corso</label>
             <p-calendar #initialHour
-                        [readonlyInput]="true"
-                        [required]="true" [showIcon]="true"
-                        dateFormat="dd/mm/yy" formControlName="dataInizio" hourFormat="24" (ngModelChange)="setDate()"
+                        (ngModelChange)="setDate()"
+                        [readonlyInput]="true" [required]="true"
+                        [showIcon]="true" dateFormat="dd/mm/yy" formControlName="dataInizio" hourFormat="24"
                         name="dataInizio"></p-calendar>
           </div>
           <div class="field col-12 md:col-2">
             <label for="dataFine">Data fine corso</label>
-            <p-calendar #initialHour [readonlyInput]="true" [required]="true"
-                        [showIcon]="true" [minDate]="formAddTasse.get('dataInizio')?.value"
+            <p-calendar #initialHour [minDate]="formAddTasse.get('dataInizio')?.value" [readonlyInput]="true"
+                        [required]="true" [showIcon]="true"
                         dateFormat="dd/mm/yy"
                         formControlName="dataFine" hourFormat="24"
                         name="dataFine"></p-calendar>
           </div>
           <div class="field col-12 md:col-2">
             <label for="costo">Costo complessivo corso</label>
-            <input
-              [min]="1"
-              [ngClass]="{'ng-invalid ng-dirty': !formAddTasse.get('costo')?.valid && (formAddTasse.get('costo')?.dirty || formAddTasse.get('costo')?.touched)}" [required]="true"
-              formControlName="costo"
-              id="costo" pInputText type="number">
+            <div class="input-container">
+              <input [min]="1"
+                     [ngClass]="{'ng-invalid ng-dirty': !formAddTasse.get('costo')?.valid && (formAddTasse.get('costo')?.dirty || formAddTasse.get('costo')?.touched)}"
+                     [required]="true"
+                     class="input-field"
+                     formControlName="costo"
+                     id="costo" pInputText type="number">
+              <i class="pi pi-euro icon"></i></div>
           </div>
           <div class="field col-12 md:col-2">
             <label for="corso">&nbsp;</label>
-            <button [disabled]="!formAddTasse.valid"
+            <!--[disabled]="!formAddTasse.valid"-->
+            <button (click)="showStudent()"
+                    [icon]="utenti.length>0 ? 'pi pi-eye' :'pi pi-plus' "
+                    [label]="utenti.length>0 ? 'Mostra studenti' :'Aggiungi studenti' "
+                    class="p-button-warning p-button-raised p-button"
+                    pButton type="button"
+            ></button>
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="corso">&nbsp;</label>
+            <button [disabled]="!formAddTasse.valid || utenti.length==0"
                     class="p-button-success p-button-raised p-button" icon="pi pi-plus" label="Prosegui"
                     pButton type="submit"
             ></button>
           </div>
-          <div class="field col-12 md:col-2">
-            <label for="corso">&nbsp;</label>
-            <button (click)="showStudent()"
-                    [icon]="utenti.length>0 ? 'pi pi-eye' :'pi pi-plus' "
-                    [label]="utenti.length>0 ? 'Mostra studenti' :'Aggiungi studenti' " class="p-button-warning p-button-raised p-button"
-                    pButton type="button"
-            ></button>
-          </div>
+
         </div>
 
       </form>
+
+      <!--<div *ngIf="tasseForm.controls.length>0">
+
+        <form (ngSubmit)="addTassa()" @fadeInAnimation [formGroup]="formTasse" class="padding back">
+          <div formArrayName="tasse">
+            <div *ngFor="let resource of tasseForm.controls; let i=index">
+              <div [formGroupName]="i" class="p-fluid grid formgrid justify-content-start">
+                <div class="p-fluid field col-12 md:col-2">
+                  <label for="numeroProgressivo">Numero progressivo</label>
+                  <input [readOnly]="true" formControlName="numeroProgressivo" id="numeroProgressivo" pInputText
+                         type="text">
+                </div>
+                <div class="p-fluid field col-12 md:col-2">
+                  <label for="tassa">Tassa</label>
+                  <input formControlName="tassa" id="tassa" pInputText type="text">
+                </div>
+                <div class="p-fluid field col-12 md:col-4">
+                  <label for="scadenza">Scadenza</label>
+                  <p-calendar #initialHour [readonlyInput]="true"
+                              [showIcon]="true"
+                              dateFormat="DD M dd, yy"
+                              formControlName="scadenza" hourFormat="24"
+                              name="scadenza"></p-calendar>
+                </div>
+                <div class="p-fluid field col-12 md:col-2">
+                  <label for="costoSingolo">Costo</label>
+                  <div class="input-container class">
+                    <input class="input-field" formControlName="costoSingolo" id="costoSingolo" pInputText
+                           type="number">
+                    <i class="pi pi-euro icon"></i></div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </form>
+      </div>-->
+      <div *ngIf="showStudentDialog" class="padding back">
+        <div class="p-fluid formgrid grid justify-content-start col-12 md:col-12">
+          <div *ngIf="openSearch" class="field col-12 md:col-4">
+            <label for="corso">Cerca studenti</label>
+            <input
+              (ngModelChange)="searchCourse()" [(ngModel)]="cercaStudenti"
+              id="corso" pInputText type="text">
+          </div>
+          <div *ngIf="openSearch" class="field col-12 md:col-2">
+            <label for="corso">&nbsp;</label>
+            <button [disabled]="cercaStudenti.length==0"
+                    class="p-button-primary p-button-raised p-button" icon="pi pi-search" label="Cerca"
+                    pButton type="button"
+            ></button>
+
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="corso">&nbsp;</label>
+            <button (click)="addStud()"
+                    class="p-button-primary p-button-raised p-button" icon="pi pi-plus" label="Aggiungi"
+                    pButton type="button"
+            ></button>
+
+          </div>
+          <div class="field col-12 md:col-2">
+            <label for="corso">&nbsp;</label>
+            <button (click)="openSearchMod()"
+                    [class]="!openSearch ? 'p-button-success p-button-raised p-button':'p-button-danger p-button-raised p-button'"
+                    [icon]="!openSearch ? 'pi pi-search':'pi pi-times'"
+                    [label]="!openSearch ? 'Apri Ricerca':'Chiudi Ricerca'"
+                    pButton type="button"
+            ></button>
+
+          </div>
+        </div>
+        <div *ngIf="addStudenti">
+
+          <form (ngSubmit)="salvaStudenti()" @fadeInAnimation [formGroup]="formStudenti" class="padding backStrong">
+            <div formArrayName="studenti">
+              <div *ngFor="let resource of studentiForm.controls; let i=index">
+                <div [formGroupName]="i" class="p-fluid grid formgrid justify-content-start">
+                  <div class="p-fluid field col-12 md:col-2">
+                    <label for="name">Nome</label>
+                    <input formControlName="name" id="name" pInputText
+                           type="text">
+                  </div>
+                  <div class="p-fluid field col-12 md:col-2">
+                    <label for="surname">Cognome</label>
+                    <input formControlName="surname" id="surname" pInputText type="text">
+                  </div>
+                  <div class="p-fluid field col-12 md:col-3">
+                    <label for="email">Email</label>
+                    <input formControlName="email" id="email" pInputText type="text">
+                  </div>
+                  <div *ngIf="resource.valid " class="p-fluid field col-3 md:col-2">
+                    <label for="name">&nbsp;</label>
+                    <button (click)="addStudent()" label="Aggiungi" pButton type="button"></button>
+                  </div>
+                  <div *ngIf="studentiForm.controls.length>1 " class="p-fluid field col-3 md:col-2">
+                    <label for="name">&nbsp;</label>
+                    <button (click)="removeStudent(i)" label="Rimuovi" pButton type="button"></button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="grid formgrid justify-content-start">
+              <div class="p-fluid field md:col-2">
+                <label for="name">&nbsp;</label>
+                <button [disabled]="!tasseForm.valid" label="Inserisci" pButton type="submit"></button>
+              </div>
+            </div>
+          </form>
+
+
+        </div>
+        <p-table
+          *ngIf="cercaStudenti.length>0 && !selectFrormSearch"
+          @fadeInAnimation
+
+          [paginator]="true"
+          [rowsPerPageOptions]="[10,20,30]" [rows]="10" [showCurrentPageReport]="true"
+          [totalRecords]="studenti.length"
+          [value]="studenti"
+          currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords}"
+          responsiveLayout="scroll | stack"
+        >
+          <ng-template let-columns pTemplate="header">
+            <tr>
+              <th class="text-center">Nome e Cognome</th>
+              <th class="text-center">Email</th>
+
+              <th class="text-center">Azione</th>
+            </tr>
+          </ng-template>
+          <ng-template let-columns="columns" let-practice pTemplate="body">
+            <tr>
+              <td class="text-center click">{{ practice.name }} {{practice.surname}}</td>
+              <td class="text-center click">{{ practice.email }}</td>
+              <td *ngIf="!practice.presente" class="click text-center">
+
+                <button (click)="addSingleDayForSlot(practice)"
+                        [class]="'p-button ' +(!practice.aggiunto?'p-button-info':'p-button-danger')"
+                        pButton>
+                  <span *ngIf="!practice.aggiunto">Aggiungi</span><span *ngIf="practice.aggiunto">Rimuovi</span>
+                </button>
+                <button (click)="showHideInformation(practice)" *ngIf="tasseForm.controls.length>0"
+                        [class]="'p-button p-button-warning'"
+                        pButton>
+                  <span>Tasse</span>
+                </button>
+              </td>
+              <td *ngIf="practice.presente" class="click text-center">
+                <button [disabled]="true" class="p-button p-button-success" pButton>Presente</button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <br>
+        <div *ngIf="utenti.length>0" class="title-section">
+          Studenti selezionati
+        </div>
+        <p-table
+          *ngIf="utenti.length>0 "
+          [autoLayout]="true"
+          [paginator]="true"
+          [rowHover]="true"
+          [rowsPerPageOptions]="[10,20,30]"
+          [rows]="10" [showCurrentPageReport]="true" [totalRecords]="utenti.length"
+          [value]="utenti"
+          currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} utente/i"
+          styleClass="datatable-gridlines datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th class="text-center" >
+                Nome e cognome
+              </th>
+              <th class="text-center" >
+                Email
+              </th>
+              <th class="text-center">Azioni</th>
+            </tr>
+          </ng-template>
+          <ng-template let-user pTemplate="body">
+            <tr>
+              <td class="click text-center">{{user.name}} {{user.surname}}</td>
+              <td class="click text-center">{{user.email}}</td>
+              <td  class="click text-center">
+
+                <button (click)="addSingleDayForSlot(user)"
+                        [class]="'p-button ' +(!user.aggiunto?'p-button-info':'p-button-danger')"
+                        pButton>
+                  <span *ngIf="!user.aggiunto">Aggiungi</span><span *ngIf="user.aggiunto">Rimuovi</span>
+                </button>
+                <button (click)="selectUser(user)"
+                        [class]="'p-button p-button-warning'" [label]="'Tassa'"
+                        pButton>
+                </button>
+              </td>
+            </tr>
+
+
+          </ng-template>
+
+
+        </p-table>
+      </div>
+      <div *ngIf="tasseForm.valid && utenti.length>0" class="grid formgrid justify-content-end">
+        <div class="p-fluid field md:col-4">
+          <label for="name">&nbsp;</label>
+          <button (click)="addTassa()"
+                  [disabled]="!tasseForm.valid || utenti.length==0 || !formAddTasse.valid" class="p-button-success" label="Salva"
+                  pButton type="submit"></button>
+        </div>
+      </div>
     </div>
-    <p-dialog (onHide)="spinner.hide()" [(visible)]="showStudentDialog"
-              [closable]="true"
-              [draggable]="false" [header]="'Studenti per il corso' + formAddTasse.get('nomeCorso')?.value" [modal]="true" [resizable]="false">
-      <button class="p-button-primary p-button-raised p-button"
-              icon="pi pi-plus" label="Aggiungi studenti"
-              pButton type="button"></button>
-      <br>
-      <p-table
-        *ngIf="utenti.length>0"
-        [autoLayout]="true"
-        [paginator]="true"
-        [rowHover]="true"
-        [rowsPerPageOptions]="[10,20,30]"
-        [rows]="10" [showCurrentPageReport]="true" [totalRecords]="utenti.length"
-        [value]="utenti"
-        currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} utente/i"
-        styleClass="datatable-gridlines datatable-sm">
+
+    <p-dialog [appendTo]="'body'" [(visible)]="editingTasse" >
+      <p-table *ngIf="selectedUser.tasse" [value]="selectedUser.tasse" >
         <ng-template pTemplate="header">
-          <tr>
-            <th class="text-center" pSortableColumn="name" scope="col">
-              Nome
-              <p-sortIcon field="name"></p-sortIcon>
-              <p-columnFilter display="menu" field="name" type="text"></p-columnFilter>
-            </th>
-            <th class="text-center" pSortableColumn="surname" scope="col">
-              Cognome
-              <p-sortIcon field="surname"></p-sortIcon>
-              <p-columnFilter display="menu" field="surname" type="text"></p-columnFilter>
-            </th>
-            <th class="text-center" pSortableColumn="email" scope="col">
-              Email
-              <p-sortIcon field="email"></p-sortIcon>
-              <p-columnFilter display="menu" field="email" type="text"></p-columnFilter>
-            </th>
-            <th class="text-center" pSortableColumn="email" scope="col">
+          <tr >
+            <th class="text-center" >Numero Progressivo</th>
+            <th class="text-center" >Tassa</th>
+            <th class="text-center" >Scadenza</th>
+            <th class="text-center" >Costo</th>
           </tr>
         </ng-template>
-        <ng-template let-user pTemplate="body">
-          <tr>
-            <td class="click text-center">{{user.name}}</td>
-            <td class="click text-center">{{user.surname}}</td>
-            <td class="click text-center">{{user.email}}</td>
+        <ng-template pTemplate="body" let-tassa let-editing="editing" let-ri="rowIndex">
 
-          </tr>
+            <tr >
+
+              <td class="text-center click" >
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input [(ngModel)]="tassa.numeroProgressivo" pInputText type="text">
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ tassa.numeroProgressivo }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              <td class="text-center click" [pEditableColumn]="tassa.tassa" pEditableColumnField="tassa">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <input [(ngModel)]="tassa.tassa" pInputText type="text">
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ tassa.tassa }}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              <td  class="text-center click" [pEditableColumn]="tassa.scadenza" pEditableColumnField="scadenza">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <p-calendar #initialHour
+                                [(ngModel)]="tassa.scadenza"
+                                [showIcon]="true"
+                                dateFormat="DD M dd, yy" hourFormat="24"
+                                name="scadenza"></p-calendar>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ tassa.scadenza | date:'EEEE, d MMMM, y'}}
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+              <td  class="text-center click" [pEditableColumn]="tassa.costoSingolo" pEditableColumnField="costoSingolo">
+                <p-cellEditor>
+                  <ng-template pTemplate="input">
+                    <div class="input-container" style="margin-top: 10px">
+                      <input [min]="1"
+                             class="input-field"
+                              pInputText type="number" [(ngModel)]="tassa.costoSingolo">
+                      <i class="pi pi-euro icon"></i></div>
+                  </ng-template>
+                  <ng-template pTemplate="output">
+                    {{ tassa.costoSingolo }}€
+                  </ng-template>
+                </p-cellEditor>
+              </td>
+
+            </tr>
         </ng-template>
       </p-table>
+      <br>
+      <br>
     </p-dialog>
   </main>
 </div>

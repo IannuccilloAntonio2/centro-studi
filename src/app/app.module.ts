@@ -1,4 +1,4 @@
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, LOCALE_ID, NgModule} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -47,7 +47,12 @@ import {UserAliasPipe} from "./mock/user-aslias.pipe";
 import {OverlayPanelModule} from "primeng/overlaypanel";
 import { TasseComponent } from './pages/tasse/tasse.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-
+import {datePipe} from "./mock/date-pipe.pipe";
+import { ListaTasseComponent } from './pages/lista-tasse/lista-tasse.component';
+import {registerLocaleData} from "@angular/common";
+import it from '@angular/common/locales/it';
+import {TranslateModule} from "@ngx-translate/core";
+import {RippleModule} from "primeng/ripple";
 @NgModule({
   declarations: [
     AppComponent,
@@ -56,7 +61,9 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
     ListaCorsiComponent,
     UserAliasPipe,
     TasseComponent,
-    DashboardComponent
+    DashboardComponent,
+    datePipe,
+    ListaTasseComponent
   ],
   imports: [
     BrowserModule,
@@ -100,7 +107,8 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
     ConfirmDialogModule,
     AutoCompleteModule,
     BrowserAnimationsModule,
-    OverlayPanelModule
+    OverlayPanelModule, TranslateModule,
+    TranslateModule.forChild(), RippleModule
   ],
   providers: [],
   bootstrap: [AppComponent],

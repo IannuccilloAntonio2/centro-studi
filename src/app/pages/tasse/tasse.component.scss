@@ -1,0 +1,37 @@
+.padding{
+
+  padding:2rem;
+  border-radius:5px;
+  margin-top: 10px;
+  .back{
+    background-color: #dedede;
+  }
+  .backStrong{
+    background-color: #d5d5d5;
+  }
+}
+.input-container {
+  display: flex;
+  width: 100%;
+  margin-bottom: 19px;
+  margin-top: 3px;
+  .class{
+    margin-top:-5px;
+  }
+}
+
+/* Style the form icons */
+.icon {
+  padding: 8px;
+  background: dodgerblue;
+  color: white;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Style the input fields */
+.input-field {
+  width: 100%;
+  padding: 8px;
+  outline: none;
+}

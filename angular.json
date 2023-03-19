@@ -4,6 +4,7 @@
   "newProjectRoot": "projects",
   "projects": {
     "centro-studi": {
+
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {

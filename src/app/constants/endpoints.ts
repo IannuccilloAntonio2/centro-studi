@@ -29,6 +29,6 @@ export class Endpoints {
 
 
   /** TASSE */
-  public static readonly GET_TASSE = Endpoints.USER_PRINCIPAL_ROUTE + '/getTasse';
-  public static readonly ADD_TASSE = Endpoints.USER_PRINCIPAL_ROUTE + '/addTasse';
+  public static readonly GET_TASSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/getCorsiTasse';
+  public static readonly ADD_TASSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/addTasse';
 }
