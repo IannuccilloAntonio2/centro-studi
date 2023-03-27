@@ -94,12 +94,7 @@ export class ListaCorsiComponent implements OnInit, AfterViewInit {
     this.corsi = [{
       id: 0,
       name: '',
-      utenti: [{
-        id: 0,
-        name: '',
-        surname: '',
-        email: ''
-      }],
+      utenti: [],
       presenze: []
     }]
 
@@ -107,21 +102,10 @@ export class ListaCorsiComponent implements OnInit, AfterViewInit {
     this.corsoSelected = {
       id: 0,
       name: '',
-      utenti: [{
-        id: 0,
-        name: '',
-        surname: '',
-        email: ''
-      }]
+      utenti: []
     }
     this.loadCorsi()
-    this.user = [{
-      id: 0,
-      name: '',
-      surname: '',
-      email: '',
-      courseId: 0
-    }]
+    this.user = []
 
   }
 
@@ -156,12 +140,7 @@ export class ListaCorsiComponent implements OnInit, AfterViewInit {
     this.corsoSelected = {
       id: 0,
       name: '',
-      utenti: [{
-        id: 0,
-        name: '',
-        surname: '',
-        email: ''
-      }]
+      utenti: []
     }
     this.spinner.show();
     console.log(id)
@@ -669,54 +648,7 @@ export class ListaCorsiComponent implements OnInit, AfterViewInit {
 
   }
 
-  ese() {
-
-    const user = {
-      name: 'aa',
-      surname: 'boh',
-      email: 'antonio@gmail.com',
-      password: 'Ciao'
-    }
-    // vado a vedere se ci sono utenti nello storage con la funzione localStorage.getItem("utenti")
-    // la funzione JSON.parse serve solo per far capire che stiamo lavorando su un array di json
-    let utentiSalvati = JSON.parse(localStorage.getItem("utenti")|| '[]');
-    //Faccio un controllo, se nello storage non ho nessun utente inserito creo l'array che ha come chiave "utenti"
-    if(utentiSalvati.length===0){
-      //setItem serve per settare lo storage, in questo caso inseriamo un json nell'array con la funzione JSON.stringify([this.user]) ci sono le parentesi quadre perchè è un array
-      //AL POSTO DI USER DEVI METTE this.user il mio era con un esempio
-      localStorage.setItem("utenti", JSON.stringify([user]));
-      //invece se c'è almeno un elemento nello storage
-    }else{
-      //aggiungo l'utente inserito in fase di registrazione nell'array di utenti dello storage
-      //AL POSTO DI USER DEVI METTE this.user il mio era con un esempio
-      utentiSalvati.push(user);
-      // e poi setto di nuovo il localstorage con la stessa chiave ma con il nuovo array di utenti
-      localStorage.setItem("utenti", JSON.stringify(utentiSalvati));
-    }
 
 
-    console.log(JSON.parse(localStorage.getItem("utenti")|| '[]'))
-
-
-//...
-    // @ts-ignore
-  }
-
-  email:string = '';
-  password:string='';
-  login() {
-    let utenti = JSON.parse(localStorage.getItem("utenti") || '[]');
-    //sono campi fasulli tu metti dove sta ion input al posto di ngModel fai [(ngModel)]="email" e per password [(ngModel)]="password"
-    this.email = 'antonio@gmail.com'
-    this.password = 'Ciao'
-    utenti.forEach((utente:any)=>{
-      if((utente.email === this.email) && (utente.password === this.password)){
-        //TU METTI IL ROTING
-        console.log('LOGIN')
-      }else{
-        console.log('errate credenziali')
-      }
-    })
-  }
 }
 

@@ -1,4 +1,14 @@
-import {Component, LOCALE_ID, OnInit} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  LOCALE_ID,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges
+} from '@angular/core';
 import {ITasse} from "../../mock/tasse";
 import {TasseService} from "../../services/tasse.service";
 import {FormArray, FormBuilder, FormGroup, Validators} from "@angular/forms";
@@ -7,19 +17,29 @@ import {CourseService} from "../../services/course-seervice.service";
 import {NgxSpinnerService} from "ngx-spinner";
 import {User} from "../../mock/user";
 import {datePipe} from "../../mock/date-pipe.pipe";
-import {DatePipe, DecimalPipe} from "@angular/common";
+import {DatePipe, DecimalPipe, registerLocaleData} from "@angular/common";
 import {fadeInAnimation} from "../../animation/fade-in-animation";
 import {TimeZoneMock} from "../../mock/timezone";
+import localeEs from '@angular/common/locales/it';
+import {Constants} from "../../constants/constants";
+import {MessageService, PrimeNGConfig} from "primeng/api";
+import {TranslateService} from "@ngx-translate/core";
+import {Subscription} from "rxjs";
+import {Dialog} from "primeng/dialog";
+import {DynamicDialogConfig} from "primeng/dynamicdialog";
+import {ICorsiTasse} from "../../mock/corsiTasse";
 
+registerLocaleData(localeEs);
 @Component({
   selector: 'app-tasse',
   templateUrl: './tasse.component.html',
   styleUrls: ['./tasse.component.scss'],
-  providers: [datePipe, DatePipe, DecimalPipe],
+  providers: [datePipe, DatePipe, DecimalPipe, TranslateService, PrimeNGConfig, MessageService, DynamicDialogConfig],
   animations: [fadeInAnimation]
 })
-export class TasseComponent implements OnInit {
+export class TasseComponent implements OnInit, AfterViewInit, OnChanges {
 
+  scheduleOption: any;
   tasse: ITasse[];
   addTasse: boolean;
   formAddTasse: FormGroup
@@ -41,22 +61,61 @@ export class TasseComponent implements OnInit {
 
 
   selectedUser:User;
+  proseguiSelected:boolean;
   clonedProducts: { [s: string]: ITasse; } = {};
+
+  lang: string = "it";
+  subscription: Subscription;
+  fromList:boolean;
+  @Output() showAddUser = new EventEmitter<boolean>();
+  @Input() corso: ICorsiTasse = {
+    id:0,
+    tasse:[],
+    utentiArray:[],
+    name:'',
+    dataFine:'',
+    dataInizio:'',
+    corsoIniziato:false,
+    tassaMeseCorrente:[],
+    semaforo:null,
+    corsoConcluso:false,
+    utenti:'',
+    costo:''
+  };
+  @Output() displayAddUtente = new EventEmitter<boolean>();
   constructor(private tasseService: TasseService,
               private datePie: datePipe,
               private fb: FormBuilder,
               private corsiService: CourseService,
               public spinner: NgxSpinnerService,
-              private datePipeAngular: DatePipe,
-              private decimalPipe: DecimalPipe,
+              private config: PrimeNGConfig,
+              private translate: TranslateService,
+              private datePieAngular: DatePipe,
+              private messageService: MessageService,
 
               ) {
+
+    this.fromList = false;
+    translate.addLangs(['it']);
+    translate.setDefaultLang('it');
+
+    const browserLang = translate.getBrowserLang();
+    let lang = 'it';
+    this.changeLang(lang);
+    this.subscription = this.translate.stream('primeng').subscribe(data => {
+      this.config.setTranslation(data);
+    });
+    this.proseguiSelected = false;
     this.selectedUser = {
       id:0,
       name:'',
       surname:'',
       email:'',
       tasse:[],
+
+      totale:0,
+      daVersare:0,
+      versato:0
 
     }
     this.tasse = []
@@ -68,10 +127,8 @@ export class TasseComponent implements OnInit {
     this.showStudentDialog = false;
     this.selectFrormSearch = false;
     this.addStudenti = false
-    this.loadTasse();
     this.addTasse = false;
     this.cercaStudenti = '';
-    console.log(this.cercaStudenti)
     this.newCourse = false;
     this.formAddTasse = this.fb.group({
       nomeCorso: ['', Validators.required],
@@ -79,7 +136,6 @@ export class TasseComponent implements OnInit {
       dataFine: ['', Validators.required],
       costo: [ , Validators.required]
     })
-    //this.loadUtenti();
     this.formTasse = this.fb.group({
       tasse: this.fb.array([])
     })
@@ -93,8 +149,17 @@ export class TasseComponent implements OnInit {
     this.loadUtenti();
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
+        console.log(this.corso)
+    }
+  changeLang(lang: string) {
+    this.translate.use(lang);
   }
+  ngOnInit(): void {
+      console.log(this.corso)
+
+  }
+
 
 
   selectUser(user:User){
@@ -102,14 +167,19 @@ export class TasseComponent implements OnInit {
     this.editingTasse = true
   }
 
-
+  showDialogMaximized(dialog: Dialog) {
+    dialog.maximize();
+  }
   openSearchMod(){
     this.openSearch = !this.openSearch
     this.selectFrormSearch = true;
+    this.addStudenti = false;
   }
   addStud(){
     this.addStudenti = !this.addStudenti
     this.selectFrormSearch = true;
+    this.openSearch = false;
+    this.studentiForm.controls = []
     this.addStudent()
   }
 
@@ -121,11 +191,12 @@ export class TasseComponent implements OnInit {
        email: c.get('email')?.value,
        aggiunto:true,
        id: 0,
-       tasse: []
-      }
+       tasse: [],
+       totale:0,
+       daVersare:0,
+       versato:0      }
       this.utenti.push(user);
     })
-    console.log(this.utenti)
     this.addStudenti = false;
     this.studentiForm.clear()
 
@@ -140,7 +211,6 @@ export class TasseComponent implements OnInit {
           u.presente = false;
           u.tasse = []
         })
-        console.log(user)
         this.studenti = user;
         this.supportSearch = user;
         this.spinner.hide();
@@ -155,7 +225,7 @@ export class TasseComponent implements OnInit {
   }
 
   addTasseForm() {
-
+    this.tasseForm.controls = []
     const numberMonth = this.monthDiff(new Date(this.formAddTasse.get('dataInizio')?.value), new Date(this.formAddTasse.get('dataFine')?.value))
     let costo = 0;
     for (let i = 0; i <= numberMonth; i++) {
@@ -166,16 +236,18 @@ export class TasseComponent implements OnInit {
     this.tasseForm.controls.forEach((c, index) => {
       var date = new Date(this.formAddTasse.get('dataInizio')?.value), y = date.getFullYear(),
         m = new Date(this.formAddTasse.get('dataInizio')?.value).getMonth() + index;
+
       let lastDay = new Date(y, m + 1, 0);
       c.get('numeroProgressivo')?.setValue((index + 1) + '/' + this.tasseForm.controls.length);
 
 
-      c.get('tassa')?.setValue(this.datePie.transform(m + 1) + ' ' + y);
+
       if(index==numberMonth){
         c.get('scadenza')?.setValue(new Date(this.formAddTasse.get('dataFine')?.value));
       }else{
         c.get('scadenza')?.setValue(new Date(lastDay));
       }
+      c.get('tassa')?.setValue(this.datePie.transform(c.get('scadenza')?.value.getMonth()+1) + ' ' + c.get('scadenza')?.value.getFullYear());
     })
     this.tasseForm.controls.forEach((c, index) => {
       costo = this.formAddTasse.get('costo')?.value / (this.tasseForm.controls.length)
@@ -187,7 +259,8 @@ export class TasseComponent implements OnInit {
       us.tasse = this.formTasse.value.tasse
     })
 
-    console.log(this.utenti)
+    this.proseguiSelected = true;
+    console.log(this.formTasse.value.tasse)
 
   }
 
@@ -195,9 +268,6 @@ export class TasseComponent implements OnInit {
     tasse.hidden = !tasse.hidden;
   }
 
-  onRowEditInit(prod:any){
-      this.clonedProducts[prod.id] = {...prod};
-  }
 
   newCorso() {
     this.newCourse = !this.newCourse
@@ -206,13 +276,11 @@ export class TasseComponent implements OnInit {
     this.corsoSelected = null
   }
 
+  value:number = 100;
   searchCourse() {
-    this.utenti = []
     this.selectFrormSearch = false;
-    console.log(this.cercaStudenti)
     this.studenti = this.supportSearch;
     this.studenti = this.studenti.filter(s=>{
-      console.log(s.alias)
       return s.alias!.toLocaleLowerCase().includes(this.cercaStudenti.toLocaleLowerCase());
     })
   }
@@ -220,7 +288,6 @@ export class TasseComponent implements OnInit {
   selectCorso(corso: Corsi) {
     this.utenti = corso.utenti;
     this.corsoSelected = corso;
-    console.log(corso)
     this.selectFrormSearch = true;
   }
 
@@ -244,9 +311,9 @@ export class TasseComponent implements OnInit {
 
   newStudent(): FormGroup {
     return this.fb.group({
-      name: ['',],
-      surname: ['',],
-      email: ['']
+      name: ['',[Validators.required]],
+      surname: ['',[Validators.required]],
+      email: ['',[Validators.required,Validators.pattern(Constants.EMAIL_REGEX)]]
     })
   }
 
@@ -287,6 +354,7 @@ export class TasseComponent implements OnInit {
 
   addTassa(){
 
+    this.spinner.show()
     let idCorso = null;
     let nomeCorso =  this.formAddTasse.get('nomeCorso')?.value
     const tasse = {
@@ -294,13 +362,19 @@ export class TasseComponent implements OnInit {
       users:this.utenti,
       dataInizio:new Date(this.formAddTasse.get('dataInizio')?.value),
       dataFine:new Date(this.formAddTasse.get('dataFine')?.value),
+      costo:this.formAddTasse.get('costo')?.value,
       tasse: this.formTasse.value.tasse
     }
 
     console.log(tasse)
     this.tasseService.addTasse(tasse).subscribe({
       next:res=>{
-        console.log(res);
+        this.spinner.hide()
+        if(res.statusCode=='OK')
+          this.messageService.add({key: 'toastTasse', severity:'success', summary:'Aggiunto' , detail:  res.message});
+        else
+          this.messageService.add({key: 'toastTasse', severity:'error', summary:'Errore' , detail:res.message });
+        this.proseguiSelected = false;
         this.resetVariables();
       }
     })
@@ -315,8 +389,10 @@ export class TasseComponent implements OnInit {
     this.openSearch = true;
     this.selectFrormSearch = false;
     this.addStudenti = false
+    this.showStudentDialog = false;
     this.cercaStudenti = ''
     this.addTasse = false;
+    this.utenti = []
   }
   addSingleDayForSlot(evt: any) {
     if (!this.utenti.includes(evt)) {
@@ -339,5 +415,78 @@ export class TasseComponent implements OnInit {
       }
 
     }
+  }
+
+  checkEmail(email:any){
+    let exist = false;
+    let userToAdd: any;
+    let userDb:any
+    userToAdd = this.utenti.find(u=>{
+      return u.email.toLowerCase()===email.email.toLowerCase()
+    })
+    if(userToAdd)
+      exist=true;
+    else{
+      userDb = this.studenti.find(u=>{
+        return u.email.toLowerCase()===email.email.toLowerCase()
+      })
+      if(userDb)
+        exist = true;
+    }
+    if(exist)
+      this.studentiForm.setErrors({ 'invalid': true });
+    return exist;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(this.corso)
+    if(this.corso.id != 0){
+      this.showStudentDialog = true;
+      this.fromList = true;
+      this.formAddTasse.get('dataInizio')?.setValue(new Date(this.corso.dataInizio))
+      this.formAddTasse.get('dataFine')?.setValue(new Date(this.corso.dataFine))
+      this.formAddTasse.get('costo')?.setValue(+this.corso.costo)
+      console.log(this.formAddTasse.get('costo')?.value)
+      console.log(this.formAddTasse.get('dataInizio')?.value)
+      console.log(this.formAddTasse.get('dataFine')?.value)
+      console.log(this.corso)
+      this.corsiService.getAllUser().subscribe({
+        next:res=>{
+          this.studenti = []
+          this.corso.utentiArray.forEach(us=> {
+            res.forEach(user => {
+              user.presente = user.id == us.id;
+
+            })
+          })
+          this.studenti = res
+          console.log(this.studenti)
+        }
+      })
+    }
+    console.log(this.studenti)
+  }
+
+  addUserToCourse(){
+    this.spinner.show()
+    const tasse = {
+      users:this.utenti,
+      tasse: this.formTasse.value.tasse,
+      corsoId:this.corso.id
+    }
+
+    console.log(tasse)
+    this.tasseService.addUserToCourse(tasse).subscribe({
+      next:res=>{
+        this.spinner.hide()
+        this.showAddUser.emit(false)
+        if(res.statusCode=='OK')
+          this.messageService.add({key: 'toastTasse', severity:'success', summary:'Aggiunto' , detail:  res.message});
+        else
+          this.messageService.add({key: 'toastTasse', severity:'error', summary:'Errore' , detail:res.message });
+        this.proseguiSelected = false;
+        this.resetVariables();
+      }
+    })
   }
 }

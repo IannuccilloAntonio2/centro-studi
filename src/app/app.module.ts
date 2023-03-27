@@ -40,7 +40,7 @@ import {TooltipModule} from "primeng/tooltip";
 import {RxReactiveFormsModule} from "@rxweb/reactive-form-validators";
 import {MarkAsteriskDirective, MarkAsteriskDirectiveModule} from "./mark-asterisk.directive";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {HttpClientModule} from "@angular/common/http";
+import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {AutoCompleteModule} from "primeng/autocomplete";
 import {UserAliasPipe} from "./mock/user-aslias.pipe";
@@ -51,8 +51,14 @@ import {datePipe} from "./mock/date-pipe.pipe";
 import { ListaTasseComponent } from './pages/lista-tasse/lista-tasse.component';
 import {registerLocaleData} from "@angular/common";
 import it from '@angular/common/locales/it';
-import {TranslateModule} from "@ngx-translate/core";
+import {TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService} from "@ngx-translate/core";
 import {RippleModule} from "primeng/ripple";
+import {TranslateHttpLoader} from "@ngx-translate/http-loader";
+import {KnobModule} from "primeng/knob";
+
+export function HttpLoaderFactory(httpClient: HttpClient) {
+  return new TranslateHttpLoader(httpClient);
+}
 @NgModule({
   declarations: [
     AppComponent,
@@ -107,10 +113,17 @@ import {RippleModule} from "primeng/ripple";
     ConfirmDialogModule,
     AutoCompleteModule,
     BrowserAnimationsModule,
-    OverlayPanelModule, TranslateModule,
-    TranslateModule.forChild(), RippleModule
+    DividerModule,
+    OverlayPanelModule, RippleModule, ToastModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }), KnobModule
   ],
-  providers: [],
+  providers: [TranslateService],
   bootstrap: [AppComponent],
   schemas:[CUSTOM_ELEMENTS_SCHEMA]
 })

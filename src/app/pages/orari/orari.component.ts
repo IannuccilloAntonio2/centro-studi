@@ -66,40 +66,18 @@ export class OrariComponent implements OnInit {
     })
     this.startFineDefault.setHours(this.todayDate.getHours()+1)
     this.startFineDefault.setMinutes(this.todayDate.getMinutes())
-    this.user =[{
-      id:0,
-      name:'',
-      surname:'',
-      email:'',
-      courseId:0
-    }]
+    this.user =[]
 
-    this.filteredUser =[{
-      id:0,
-      name:'',
-      surname:'',
-      email:'',
-      courseId:0
-    }]
+    this.filteredUser =[]
     this.corsi = [{
       id:0,
       name: '',
-      utenti: [{
-        id:0,
-        name:'',
-        surname:'',
-        email:''
-      }]
+      utenti: []
     }]
     this.filterCourse = [{
       id:0,
       name: '',
-      utenti: [{
-        id:0,
-        name:'',
-        surname:'',
-        email:''
-      }]
+      utenti: []
     }]
     this.loadCorsi();
     this.loadUser();

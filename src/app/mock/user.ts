@@ -14,4 +14,7 @@ export interface User {
   tasse?:ITasse[]
   tassArray?:FormArray
   tassaMeseCorrente?:ITasse;
+  totale:number
+  daVersare:number;
+  versato:number;
 }

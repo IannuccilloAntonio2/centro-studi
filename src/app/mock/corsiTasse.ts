@@ -9,9 +9,10 @@ export interface ICorsiTasse {
   utenti:string
   tasse:ITasse[]
   utentiArray:User[]
-  tassaMeseCorrente?:ITasse[];
+  tassaMeseCorrente:ITasse[];
   semaforo?:any;
   corsoIniziato:boolean;
   corsoConcluso:boolean
+  costo:string;
 
 }

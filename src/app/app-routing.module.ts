@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
 import {OrariComponent} from "./pages/orari/orari.component";
 import {ListaCorsiComponent} from "./pages/lista-corsi/lista-corsi.component";
 import {TasseComponent} from "./pages/tasse/tasse.component";
@@ -26,6 +26,7 @@ const routes: Routes = [
     path: 'tasse',
     component: ListaTasseComponent
 
+
   },
   {
     path: 'dashboard',
@@ -35,7 +36,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {useHash: true, preloadingStrategy: PreloadAllModules}) ],
   exports: [RouterModule]
 })
 

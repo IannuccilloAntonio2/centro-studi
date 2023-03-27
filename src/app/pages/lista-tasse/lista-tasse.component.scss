@@ -1,0 +1,73 @@
+.input-container {
+  display: flex;
+  width: 100%;
+  margin-bottom: 19px;
+  margin-top: 3px;
+  .class{
+    margin-top:-5px;
+  }
+}
+
+/* Style the form icons */
+.icon {
+  padding: 8px;
+  background: dodgerblue;
+  color: white;
+  min-width: 40px;
+  text-align: center;
+  border-radius: 2px;
+}
+
+.msgNoDipendenti {
+  text-align: center;
+  color: var(--blue-ncs);
+  padding: 2rem;
+}
+.icon2 {
+  padding: 8px;
+  background: #639b10;
+  margin-left: 5px;
+  color: white;
+  min-width: 40px;
+  text-align: center;
+  border-radius: 2px;
+}
+
+/* Style the input fields */
+.input-field {
+  width: 100%;
+  padding: 8px;
+  outline: none;
+}
+.padding{
+
+  padding:2rem;
+  border-radius:5px;
+  margin-top: 10px;
+  .back{
+    background-color: #dedede;
+  }
+  .backStrong{
+    background-color: #d5d5d5;
+  }
+}
+
+.pagato{
+
+}
+
+.non-pagato{
+
+}
+
+.backStrong{
+  background-color: #d5d5d5;
+}
+
+:host ::ng-deep .knob text.p-knob-text {
+
+}
+
+app-lista-tasse .knob text.p-knob-text{
+  font-size: 15px !important;
+}

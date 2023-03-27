@@ -1,7 +1,39 @@
+
 <div class="main-area" xmlns="http://www.w3.org/1999/html">
+  <p-divider type="dashed" align="center">
+    <p-button label="Dashboard" styleClass="p-button-text"></p-button>
+  </p-divider>
   <main>
-    <button pButton [routerLink]="'/tasse'" label="Lista tasse"></button>
+    <!--<button pButton [routerLink]="'/tasse'" label="Lista tasse"></button>
     <button pButton [routerLink]="'/nuova-tassa'" label="Aggiungi tasse"></button>
-    <button pButton [routerLink]="'/corsi'" label="Presenze"></button>
+    <button pButton [routerLink]="'/corsi'" label="Presenze"></button>-->
+
+    <div style="width:100%; align-items:center">
+      <div class="cards"  >
+        <div class="card-single" pButton style="text-align: center; align-items:center; border-color: #06D6A0FF; font-size: 30px; display: flex" [routerLink]="'/tasse'">
+             <i class="pi pi-money-bill" style="font-size: 30px"></i> &nbsp;<span >Lista Tasse</span>
+          <div>
+            <span class="las la-business-time"></span>
+          </div>
+        </div>
+        <div class="card-single" pButton style="text-align: center; align-items:center; border-color: #4769EFFF; font-size: 30px; display: flex" [routerLink]="'/nuova-tassa'" >
+          <div  >
+            <i class="pi pi-file-o" style="font-size: 30px"></i> &nbsp;<span >Aggiungi Tasse</span>
+          </div>
+          <div>
+            <span class="las la-business-time"></span>
+          </div>
+        </div>
+        <div class="card-single" pButton style="text-align: center; align-items:center; border-color: #FFD166FF; font-size: 30px; display: flex" [routerLink]="'/corsi'" >
+          <div  >
+            <i class="pi pi-user" style="font-size: 30px"></i> &nbsp;<span >Presenze</span>
+          </div>
+          <div>
+            <span class="las la-business-time"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </main>
 </div>

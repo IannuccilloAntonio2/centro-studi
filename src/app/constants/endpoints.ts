@@ -1,7 +1,7 @@
 
 
 export class Endpoints {
-  public static readonly SERVICE_ENDPOINT ='http://localhost:80/api'//'https://test.cloudsd.it/provaGits/public/index.php/api';////'https://saccucci-testing.herokuapp.com'; //
+  public static readonly SERVICE_ENDPOINT ='https://test.cloudsd.it/provaGits/public/index.php/api';//'http://localhost:80/api'////'https://saccucci-testing.herokuapp.com'; //
 
   public static readonly COURSE_PRINCIPAL_ROUTE = Endpoints.SERVICE_ENDPOINT + '/courses';
   public static readonly USER_PRINCIPAL_ROUTE = Endpoints.SERVICE_ENDPOINT + '/user';
@@ -31,4 +31,12 @@ export class Endpoints {
   /** TASSE */
   public static readonly GET_TASSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/getCorsiTasse';
   public static readonly ADD_TASSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/addTasse';
+  public static readonly UPDATE_TASSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/updateTasse';
+  public static readonly DELETE_CORSI_TASSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/deleteCorso/';
+  public static readonly ADD_TASSE_USER = Endpoints.COURSE_PRINCIPAL_ROUTE + '/addTasseUser';
+  public static readonly DELETE_TASSA_USER = Endpoints.COURSE_PRINCIPAL_ROUTE + '/deleteTassa/';
+  public static readonly REMOVE_USER_FROM_COURSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/removeUserFromCourse';
+  public static readonly UPDATE_TASSA = Endpoints.COURSE_PRINCIPAL_ROUTE + '/updateTassa';
+  public static readonly ADD_USER_TO_COURSE = Endpoints.COURSE_PRINCIPAL_ROUTE + '/addUserToCourse';
+  public static readonly SEND_EMAIL_NOTIFICATION = Endpoints.COURSE_PRINCIPAL_ROUTE + '/sendEmailNotification';
 }

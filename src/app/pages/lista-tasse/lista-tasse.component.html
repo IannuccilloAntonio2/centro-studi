@@ -1,30 +1,48 @@
 <div class="main-area" xmlns="http://www.w3.org/1999/html">
+
   <main>
     <ngx-spinner [fullScreen]="true" [zIndex]="50" bdColor="rgba(255, 255, 255, 0.8)" color="#118ab2"
                  size="medium" type="square-jelly-box">
       <p style="color: #118ab2"> Caricamento... </p>
     </ngx-spinner>
+    <p-toast key="myKey1" position="top-right"></p-toast>
     <div class="title-with-button">
 
-      <div class="child2" *ngIf="showList">
-        <i class="pi pi-money-bill"></i> <span> Lista corsi</span>
+      <div *ngIf="showList" class="child2">
+        <span> Lista corsi</span>
       </div>
-      <div class="child2" *ngIf="!showList">
-         <span>Corso: {{corsoSelected.name}}</span>
+      <div *ngIf="!showList && !showTassa" class="child2">
+        <span>Corso: {{corsoSelected.name}}</span>
+      </div>
+      <div *ngIf="!showList && showTassa" class="child2">
+        <span>Situazione tasse: <b>{{selectedUser.name}} {{selectedUser.surname}}</b></span>
       </div>
 
       <div class="child">
         <button *ngIf="showList"
-                class="p-button-primary p-button-raised p-button" icon="pi pi-plus" label="Nuova tassa"
+                [routerLink]="'/dashboard'" class="p-button-primary p-button-raised p-button" icon="pi pi-arrow-left"
+                label="Dashboard"
                 pButton type="button"></button>
-        <button *ngIf="!showList"
-                class="p-button-warning p-button-raised p-button" icon="pi pi-arrow-left" label="Torna alla lista" (click)="showList=true"
+        <button (click)="showList=true"
+                *ngIf="!showList && !showTassa" class="p-button-warning p-button-raised p-button"
+                icon="pi pi-arrow-left"
+                label="Torna alla lista tasse"
+                pButton type="button"></button>
+        <button (click)="showTassa=false"
+                *ngIf="!showList && showTassa" class="p-button-warning p-button-raised p-button"
+                icon="pi pi-arrow-left" label="Torna alla lista studenti"
                 pButton type="button"></button>
       </div>
 
 
     </div>
-    <div  class="card" @fadeInAnimation *ngIf="showList">
+    <div *ngIf="showList" @fadeInAnimation class="card">
+      <div *ngIf="corsi.length==0" class="p-col-12">
+        <div class="msgNoDipendenti">
+          <span class="pi pi-info-circle" style="font-size: 40px"></span>
+          <h3>Non ci sono corsi inseriti al momento, per iniziare <a routerLink="/nuova-tassa">clicca qui</a></h3>
+        </div>
+      </div>
       <p-table
 
         *ngIf="corsi.length!==0"
@@ -42,7 +60,7 @@
             <th class="text-center">Inizio corso</th>
             <th class="text-center">Fine corso</th>
             <th class="text-center">Studenti</th>
-            <th class="text-center">Situazione Tasse mese corrente</th>
+            <th class="text-center">Situazione Tasse mese</th>
             <th class="text-center">Azioni</th>
           </tr>
         </ng-template>
@@ -52,22 +70,57 @@
             <td class="text-center click">{{ practice.dataInizio | date:'dd/MM/yyyy' }}</td>
             <td class="text-center click">{{ practice.dataFine | date:'dd/MM/yyyy'}}</td>
             <td class="text-center click">{{ practice.utentiArray.length}}</td>
-            <td class="text-center click"><p-tag [style]="{'width': '50%'}"
-                                                 [value]="practice.semaforo.message"
-                                                 [severity]="getSemaforoColor(practice.semaforo.id)"></p-tag></td>
+            <td class="text-center click">
+              <p-tag [severity]="getSemaforoColor(practice.semaforo.id)"
+                     [style]="{'width': '50%'}"
+                     [value]="practice.semaforo.message"></p-tag>
+            </td>
 
             <td class="text-center">
-              <button class="p-button p-button-text p-button-lg" icon="pi pi-eye" pButton type="button" (click)="selectCorso(practice)"
-              ></button>
-              <button class="p-button p-button-danger p-button-text p-button-lg" icon="pi pi-trash" pButton
+              <button (click)="selectCorso(practice)" class="p-button p-button-text p-button-lg" icon="pi pi-eye"
+                      pButton
                       type="button"
               ></button>
+              <button (click)="showConfirm(practice.name,'c','il corso:')"
+                      class="p-button p-button-danger p-button-text p-button-lg"
+                      icon="pi pi-trash"
+                      pButton type="button"
+              ></button>
+
             </td>
           </tr>
+          <p-toast (onClose)="onReject()" [baseZIndex]="5000" key="c" position="center">
+            <ng-template let-message pTemplate="message">
+              <div class="flex flex-column" style="flex: 1">
+                <div class="text-center">
+                  <i class="pi pi-exclamation-triangle" style="font-size: 3rem"></i>
+                  <h4>{{message.summary}}</h4>
+                  <br>
+                  <p>{{message.detail}}</p>
+                  <br>
+                </div>
+                <div class="grid p-fluid">
+                  <div class="col-6">
+                    <button (click)="deleteCorsiTasse(practice.id)" class="p-button-success" label="Si" pButton
+                            type="button"></button>
+                  </div>
+                  <div class="col-6">
+                    <button (click)="onReject()" class="p-button-secondary" label="No" pButton type="button"></button>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </p-toast>
         </ng-template>
       </p-table>
     </div>
-    <div  class="card" @fadeInAnimation *ngIf="!showList">
+    <div *ngIf="!showList && !showTassa" @fadeInAnimation class="card">
+      <div class="p-fluid formgrid grid justify-content-start col-12 md:col-12 padding">
+        <div class="field col-12 md:col-4">
+          <button (click)="show()" [icon]="'pi pi-plus'" label="Aggiungi studenti" pButton></button>
+        </div>
+
+      </div>
       <p-table
 
         *ngIf="corsoSelected.utentiArray.length!==0"
@@ -87,50 +140,396 @@
             <th class="text-center">Prossima tassa</th>
             <th class="text-center">Scadenza</th>
             <th class="text-center">Situazione tasse mese corrente</th>
-            <th class="text-center">Paga</th>
+            <th class="text-center">Rimuovi</th>
             <th class="text-center">Azioni</th>
           </tr>
         </ng-template>
         <ng-template let-columns="columns" let-user pTemplate="body">
-         <tr >
+          <tr>
             <td class="text-center click">{{ user.name }} {{ user.surname }}</td>
             <td class="text-center click">{{ user.email  }}</td>
             <td class="text-center click">{{ user.tassaMeseCorrente.tassa  }}</td>
             <td class="text-center click">{{ user.tassaMeseCorrente.scadenza | date:'dd/MM/yyyy'}}</td>
-            <td class="text-center click"><p-badge [style]="{'width': '70%'}"
-              [value]="user.tassaMeseCorrente.stato==1 ? 'Da pagare':'Regolare'"
-                                                 [severity]="user.tassaMeseCorrente.stato==1 ? 'danger':'success'"></p-badge>
+            <td class="text-center click">
+              <p-badge [severity]="user.tassaMeseCorrente.stato==1 ? 'danger':'success'"
+                       [style]="{'width': '70%'}"
+                       [value]="user.tassaMeseCorrente.stato==1 ? 'Da pagare':'Regolare'"></p-badge>
 
 
+            <td class="text-center">
+              <button (click)="showConfirm((user.name + ' ' + user.surname),'user','l\'utente:')"
+                      [disabled]="corsoSelected.utentiArray.length==1"
+                      class="p-button p-button-danger p-button-text p-button-lg" icon="pi pi-trash"
+                      pButton type="button"></button>
+            </td>
+            <td class="text-center">
+              <button (click)="selectUser(user) " class="p-button p-button-text p-button-lg" icon="pi pi-money-bill"
+                      pButton
+                      pTooltip="Mostra tasse" tooltipPosition="top" type="button"
+              ></button>
+              <div
+                [pTooltip]="((user.tassaMeseCorrente.stato==1 && !user.tassaMeseCorrente.notificaPagamento)? 'Invia notifica di pagamento':'Notifica di pagamento inviata')"
+                style="display:inline-block;" tooltipPosition="top">
+                <button (click)="showEnvelopeEmail(user.tassaMeseCorrente)"
+                        *ngIf="user.tassaMeseCorrente.stato==1"
 
-           <td class="text-center">
-           <div [pTooltip]="(user.tassaMeseCorrente.stato==1 ? 'Spunta come pagato':'Tassa pagata')" style="display:inline-block;" tooltipPosition="top">
-             <button [class]="(user.tassaMeseCorrente.stato==2 ? 'p-button-success':'p-button-danger')" class="p-button p-button-text p-button-lg"
-                     icon="pi pi-check-circle" pButton type="button"  [disabled]="user.tassaMeseCorrente.stato==2"
-             ></button>
-           </div>
-           </td>
-           <td class="text-center">
-             <button class="p-button p-button-text p-button-lg" icon="pi pi-money-bill" pButton type="button"  (click)="showHideInformation(user) "
-             ></button>
-             <div [pTooltip]="((user.tassaMeseCorrente.stato==1 && !user.tassaMeseCorrente.notificaPagamento)? 'Invia notifica di pagamento':'Notifica di pagamento inviata')"
-                  style="display:inline-block;" tooltipPosition="top">
-             <button *ngIf="user.tassaMeseCorrente.stato==1" icon="pi pi-envelope" pButton
-
-                     type="button" [disabled]="(user.tassaMeseCorrente.stato==1 && user.tassaMeseCorrente.notificaPagamento)"
-                     [class]="((user.tassaMeseCorrente.stato==1 && !user.tassaMeseCorrente.notificaPagamento)? 'p-button-danger':'p-button-success')" class="p-button p-button-text p-button-lg"
-             ></button>
-             </div>
-             <button  *ngIf="user.tassaMeseCorrente.stato==2"
-               icon="pi pi-envelope" pButton
-                      type="button" [disabled]="true"
-                      class="p-button p-button-text p-button-lg"
-             ></button>
-           </td>
+                        [class]="((user.tassaMeseCorrente.stato==1 && !user.tassaMeseCorrente.notificaPagamento)? 'p-button-danger':'p-button-success')"
+                        [disabled]="(user.tassaMeseCorrente.stato==1 && user.tassaMeseCorrente.notificaPagamento)"
+                        class="p-button p-button-text p-button-lg" icon="pi pi-envelope"
+                        pButton
+                        type="button"
+                ></button>
+                <!---->
+              </div>
+              <button *ngIf="user.tassaMeseCorrente.stato==2"
+                      [disabled]="true" class="p-button p-button-text p-button-lg"
+                      icon="pi pi-envelope" pButton
+                      type="button"
+              ></button>
+            </td>
           </tr>
-
+          <p-toast (onClose)="onReject()" [baseZIndex]="5000" key="user" position="center">
+            <ng-template let-message pTemplate="message">
+              <div class="flex flex-column" style="flex: 1">
+                <div class="text-center">
+                  <i class="pi pi-exclamation-triangle" style="font-size: 3rem"></i>
+                  <h4>{{message.summary}}</h4>
+                  <br>
+                  <p>{{message.detail}}</p>
+                  <br>
+                </div>
+                <div class="grid p-fluid">
+                  <div class="col-6">
+                    <button (click)="deleteuserFromCourse(user.id)" class="p-button-success" label="Si" pButton
+                            type="button"></button>
+                  </div>
+                  <div class="col-6">
+                    <button (click)="onReject()" class="p-button-secondary" label="No" pButton type="button"></button>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </p-toast>
         </ng-template>
       </p-table>
     </div>
+    <div *ngIf="!showList && showTassa" @fadeInAnimation class="card " id="print">
+      <div class="p-fluid formgrid grid justify-content-start col-12 md:col-12 padding">
+        <div class="field col-12 md:col-4"
+             pTooltip="Il sistema scala automaticamente costo delle varie tasse in base al prezzo inserito"
+             tooltipPosition="top">
+          <label for="costo">Inserisci importo da pagare</label>
+          <div class="input-container">
+            <input [(ngModel)]="pagamento"
+                   [min]="1"
+                   [required]="true"
+                   class="input-field"
+                   id="costo" pInputText type="number">
+            <i class="pi pi-euro icon"></i></div>
+        </div>
+        <div class="field col-12 md:col-2" style="'margin-top':'2px'">
+          <label>&nbsp;</label>
+          <button
+            (click)="aggiornaPagamento()"
+            [class]="'p-button-info p-button-raised p-button'"
+            [icon]="'pi pi-check'" [label]="'Paga'"
+            pButton type="button"
+          ></button>
+
+        </div>
+        <div class="field col-12 md:col-2" style="'margin-top':'2px'">
+          <label>&nbsp;</label>
+          <button
+            (click)="aggiungiTasse()"
+            [class]="!addTasse ? 'p-button-success ':'p-button-warning '"
+            [icon]="!addTasse ? 'pi pi-plus':'pi pi-times'"
+            [label]="!addTasse ? 'Aggiungi tasse':'Chiudi'" class="p-button-raised p-button"
+            pButton type="button"
+          ></button>
+
+        </div>
+
+        <p-messages [enableService]="true" [key]="'info'"></p-messages>
+      </div>
+      <div *ngIf="addTasse">
+
+        <form (ngSubmit)="salvaTasse()" *ngIf="tasseForm.controls.length>0" @fadeInAnimation [formGroup]="formTasse"
+              class="padding backStrong">
+          <div formArrayName="tasse">
+            <div *ngFor="let resource of tasseForm.controls; let i=index">
+              <div [formGroupName]="i" class="p-fluid grid formgrid justify-content-start">
+                <div class="p-fluid field col-12 md:col-1">
+                  <label for="numeroProgressivo">N.</label>
+                  <input [required]="true" formControlName="numeroProgressivo" id="numeroProgressivo" pInputText
+                         readonly
+                         type="text">
+                </div>
+                <div class="p-fluid field col-12 md:col-3">
+                  <label for="scadenza">Scadenza</label>
+                  <p-calendar #initialHour [required]="true"
+                              [showIcon]="true"
+                              dateFormat="DD M dd, yy"
+                              formControlName="scadenza"
+                              name="scadenza"></p-calendar>
+
+                </div>
+                <div class="p-fluid field col-12 md:col-2">
+                  <label for="tassa">Tassa</label>
+                  <input [required]="true" formControlName="tassa" id="tassa" pInputText type="text">
+                </div>
+
+                <div class="p-fluid field col-12 md:col-2 ">
+
+                  <label for="costoSingolo">Costo</label>
+                  <div class="input-container">
+                    <input [min]="1" [required]="true" formControlName="costoSingolo" id="costoSingolo" pInputText
+                           type="number">
+
+                    <i class="pi pi-euro icon"></i></div>
+                </div>
+                <div class="p-fluid field col-3 md:col-2">
+                  <label for="name">&nbsp;</label>
+                  <button (click)="addSkills()" [disabled]=" !resource.valid" label="Aggiungi" pButton
+                          type="button"></button>
+                </div>
+                <div class="p-fluid field col-3 md:col-2">
+                  <label for="name">&nbsp;</label>
+                  <button (click)="removeTassa(i)" label="Rimuovi" pButton type="button"></button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="grid formgrid justify-content-start">
+            <div class="p-fluid field md:col-2">
+              <label for="name">&nbsp;</label>
+              <button [disabled]="!tasseForm.valid" label="Inserisci" pButton type="submit"></button>
+            </div>
+          </div>
+        </form>
+
+
+      </div>
+
+      <p-table *ngIf="selectedUser.tasse!=undefined" [value]="selectedUser!.tasse" responsiveLayout="scroll | stack">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center">Numero Progressivo</th>
+            <th class="text-center">Tassa</th>
+            <th class="text-center">Scadenza</th>
+            <th class="text-center">Costo</th>
+            <th class="text-center">Da pagare</th>
+            <th class="text-center">Stato</th>
+            <th class="text-center">Elimina</th>
+          </tr>
+        </ng-template>
+        <ng-template let-editing="editing" let-ri="rowIndex" let-tassa pTemplate="body">
+
+          <tr [class]="tassa.stato==1 ? 'non-pagato':'pagato'">
+
+            <td class="text-center click">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+                  <input [(ngModel)]="tassa.numeroProgressivo" pInputText type="text">
+                </ng-template>
+                <ng-template pTemplate="output">
+                  {{ tassa.numeroProgressivo }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td class="text-center click">
+              <p-cellEditor>
+                <ng-template pTemplate="output">
+                  {{ tassa.tassa }}
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td [pEditableColumn]="tassa.scadenza" class="text-center click" pEditableColumnField="scadenza">
+              <p-cellEditor>
+                <ng-template pTemplate="input">
+
+                  <p-calendar #initialHour [(ngModel)]="tassa.scadenzaDate"
+                              [showIcon]="true"
+                              [style]="{'width':'88%'}"
+                              dateFormat="DD M dd, yy" hourFormat="24"
+                              name="scadenza"></p-calendar>
+
+                  <button (click)="updateTassa(tassa)" [disabled]="tassa.editedDate.toDateString().startsWith(tassa.scadenzaDate.toDateString())" [style]="{'width':'8%'}"
+                          class="icon2 click p-button-success" icon="pi pi-check-circle"
+                          pButton
+                          pTooltip="Clicca per apportare le modifiche"></button>
+                </ng-template>
+                <ng-template pTemplate="output">
+                  <p-calendar #initialHour
+                              [(ngModel)]="tassa.scadenzaDate"
+                              [defaultDate]="tassa.scadenzaDate"
+                              [disabled]="true" [style]="{'width':'100%'}"
+                              dateFormat="DD M dd, yy" hourFormat="24"
+                              name="scadenza"></p-calendar>
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td class="text-center click">
+              <p-cellEditor>
+                <ng-template pTemplate="output">
+                  {{ tassa.costo }}€
+                </ng-template>
+              </p-cellEditor>
+            <td class="text-center click">
+              <p-cellEditor>
+
+                <ng-template pTemplate="output">
+                  {{ tassa.rimanenza }}€
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td class="text-center click">
+              <p-cellEditor>
+                <ng-template pTemplate="output">
+                  <div [pTooltip]="(!tassa.rimanenza.startsWith('0') ? 'Da pagare':'Tassa pagata')"
+                       style="display:inline-block;" tooltipPosition="top">
+                    <button [class]="(tassa.rimanenza.startsWith('0') ? 'p-button-success':'p-button-danger')"
+                            [disabled]="true"
+                            class="p-button p-button-text p-button-lg" icon="pi pi-check-circle" pButton type="button"
+                    ></button>
+                  </div>
+                </ng-template>
+              </p-cellEditor>
+            </td>
+            <td class="text-center click">
+              <button (click)="showConfirm(tassa.tassa,'tassa','la tassa:')"
+                      class="p-button p-button-danger p-button-text p-button-lg"
+                      icon="pi pi-trash"
+                      pButton type="button"></button>
+              <button *ngIf="editing" class="p-button p-button-danger p-button-text p-button-lg"
+                      icon="pi pi-edit"
+                      pButton type="button"></button>
+            </td>
+          </tr>
+          <p-toast (onClose)="onReject()" [baseZIndex]="5000" key="tassa" position="center">
+            <ng-template let-message pTemplate="message">
+              <div class="flex flex-column" style="flex: 1">
+                <div class="text-center">
+                  <i class="pi pi-exclamation-triangle" style="font-size: 3rem"></i>
+                  <h4>{{message.summary}}</h4>
+                  <br>
+                  <p>{{message.detail}}</p>
+                  <br>
+                </div>
+                <div class="grid p-fluid">
+                  <div class="col-6">
+                    <button (click)="deleteTassa(tassa.id)" class="p-button-success" label="Si" pButton
+                            type="button"></button>
+                  </div>
+                  <div class="col-6">
+                    <button (click)="onReject()" class="p-button-secondary" label="No" pButton type="button"></button>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </p-toast>
+        </ng-template>
+
+      </p-table>
+      <br>
+      <div [style]="{'margin-top':'18px','margin-bottom':'-30px'}"
+           class="p-fluid formgrid grid justify-content-center col-12 md:col-12 ">
+        <div class="field col-12 md:col-3" style="text-align: center">
+
+          <label><h3>Totale</h3></label>
+          <p-knob [(ngModel)]="selectedUser.totale" [max]="selectedUser.totale" [rangeColor]="'#ef476fff'" [readonly]="true"
+                  [size]="180" [strokeWidth]="3" [style]="{'width':'100%'}"
+                  [valueColor]="'#639b10'" valueTemplate="{{selectedUser.totale}}€"></p-knob>
+
+        </div>
+        <div class="field col-12 md:col-3 " style="text-align: center">
+          <label><h3>Da versare</h3></label>
+          <p-knob [(ngModel)]="selectedUser.daVersare" [max]="selectedUser!.totale" [rangeColor]="'#639b10'" [readonly]="true"
+                  [size]="180" [strokeWidth]="3" [valueColor]="'#ef476fff'"
+                  valueTemplate="{{selectedUser.daVersare}}€"></p-knob>
+
+
+        </div>
+        <div class="field col-12 md:col-3" style="text-align: center">
+          <label><h3>Versato</h3></label>
+          <p-knob [(ngModel)]="selectedUser.versato" [max]="selectedUser!.totale" [rangeColor]="'#ef476fff'" [readonly]="true"
+                  [size]="180" [strokeWidth]="3"
+                  [valueColor]="'#639b10'" valueTemplate="{{selectedUser.versato}}€"></p-knob>
+
+
+        </div>
+      </div>
+      <div class="p-fluid formgrid grid justify-content-end col-12 md:col-12 padding">
+        <div class="field col-12 md:col-3">
+          <label>&nbsp;</label>
+          <button
+            (click)="annullaPagamento()"
+            [class]="'p-button-danger p-button-raised p-button'"
+            [icon]="'pi pi-check'" [label]="'Annulla modifiche'"
+            pButton type="button"
+          ></button>
+
+        </div>
+
+        <div class="field col-12 md:col-3">
+          <label>&nbsp;</label>
+
+          <button
+            (click)="showStampaRicevuta()" [class]="'p-button-success p-button-raised p-button'"
+            [disabled]="!tasseAggiornate"
+            [icon]="'pi pi-check'" [label]="'Salva'"
+            pButton type="button"
+          ></button>
+
+        </div>
+
+      </div>
+    </div>
+    <p-toast (onClose)="onReject()" [baseZIndex]="5000" key="ricevuta" position="center">
+      <ng-template let-message pTemplate="message">
+        <div class="flex flex-column" style="flex: 1">
+          <div class="text-center">
+            <i class="pi pi-exclamation-triangle" style="font-size: 3rem"></i>
+            <h4>{{message.summary}}</h4>
+            <br>
+            <p>{{message.detail}}</p>
+            <br>
+          </div>
+          <div class="grid p-fluid">
+            <div class="col-6">
+              <button (click)="exportToPDF()" class="p-button-success" label="Si" pButton
+                      type="button"></button>
+            </div>
+            <div class="col-6">
+              <button (click)="salvaTasse()" class="p-button-secondary" label="No" pButton type="button"></button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-toast>
+    <p-dialog #dialDetail (onHide)="loadAll();showList=true" (onShow)="showDialogMaximized(dialDetail)" *ngIf="corsoSelected"
+              [(visible)]="showAddUser" [header]="'Aggiungi studenti al corso: '+corsoSelected.name">
+      <app-tasse (showAddUser)="change($event)" *ngIf="showAddUser" [corso]="corsoSelected"></app-tasse>
+    </p-dialog>
+
+    <p-dialog [(visible)]="sendEmailDialog" [draggable]="false" [modal]="true" [position]="'center'"
+              [resizable]="false"
+              [style]="{width: '50vw'}" header="Invio email di notifica">
+      <div class="p-fluid formgrid grid justify-content-start">
+        <div class="field col-12">
+          <label>Vuoi inserire una nota aggiuntiva?</label>
+          <textarea
+            [(ngModel)]="emailNotification.nota" [draggable]="false"
+            cols="40"
+            pInputText></textarea>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+        <p-button (click)="sendEmail()" icon="pi pi-check" label="Invia" styleClass="p-button-success"></p-button>
+      </ng-template>
+
+    </p-dialog>
+
+
   </main>
 </div>

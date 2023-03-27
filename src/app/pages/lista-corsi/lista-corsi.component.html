@@ -4,14 +4,13 @@
                  size="medium" type = "square-jelly-box" >
       <p style="color: #118ab2"> Caricamento... </p>
     </ngx-spinner>
-    <!--<br>
+
     <div class="grid">
       <div class="col">
-        <button pButton type="button" label="Torna al menù principale" icon="pi pi-arrow-circle-left"
-                class="p-button-primary p-button-raised" routerLink="/admin"></button>
+        <button pButton type="button" label="Dashboard" icon="pi pi-arrow-circle-left"
+                class="p-button-primary p-button-raised" routerLink="/dashboard"></button>
       </div>
     </div>
-    <br>-->
     <br>
     <div *ngIf="displayModalList" class="title-with-button">
 
@@ -97,7 +96,7 @@
       [rows]="10" [showCurrentPageReport]="true" [totalRecords]="corsi.length"
       [value]="corsi"
       currentPageReportTemplate="Risultati da {first} a {last}. Totale {totalRecords} corso/i"
-      styleClass="datatable-gridlines datatable-sm">
+      styleClass="datatable-gridlines datatable-sm" responsiveLayout="scroll | stack">
       <ng-template pTemplate="header">
         <tr>
           <th class="text-center" pSortableColumn="corso" scope="col">
